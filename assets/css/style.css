@@ -3,6 +3,9 @@
     padding:0;
     box-sizing:border-box;
 }
+body{
+    font-family:'Poppins',sans-serif;
+}
 
 body{
 
@@ -77,9 +80,11 @@ header{
 }
 @media(max-width:768px){
 
-.navbar{
+.hero h1{
 
-    flex-direction:column;
+font-size:2.6rem;
+
+}
 
 }
 
@@ -93,76 +98,99 @@ header{
 
 }
 
+.hero {
+    height: 100vh;
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,.60),
+            rgba(0,0,0,.35)
+        ),
+        url("../images/hero.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    justify-content: center;   /* Horizontal centre */
+    align-items: center;       /* Vertical centre */
+
+    text-align: center;
 }
-.hero{
+.hero-overlay {
 
-    height:90vh;
+    max-width: 900px;
 
-    background-image:url("../images/hero.jpg");
+    width: 90%;
 
-    background-size:cover;
+    margin: auto;
 
-    background-position:center;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
+    text-align: center;
 }
-.hero{
+.hero h1 {
 
-    height:90vh;
+    color: white;
 
-    background-image:url("../images/hero.jpg");
-    
-    background-size:cover;
+    font-size: 4.5rem;
 
-    background-position:center;
+    font-weight: 700;
 
-    display:flex;
+    line-height: 1.2;
 
-    justify-content:center;
+    margin-bottom: 25px;
 
-    align-items:center;
-
+    text-align: center;
 }
-.hero h1{
+.hero p {
 
-    font-size:54px;
+    color: white;
 
-    margin-bottom:20px;
+    font-size: 1.4rem;
 
+    line-height: 1.8;
+
+    max-width: 800px;
+
+    margin: 0 auto 40px;
+
+    text-align: center;
 }
-.hero h1{
 
-    font-size:54px;
+.hero-buttons {
 
-    margin-bottom:20px;
+    display: flex;
 
+    justify-content: center;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+
+    margin-top: 30px;
 }
-.hero p{
-
-    max-width:700px;
-
-    font-size:22px;
-
-    line-height:1.7;
-
-    margin-bottom:35px;
-
-}
+.hero-button{
+    display: inline-block;
+    background: #2c5f5d;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+ }
 .hero-button:hover{
 
-    background:#115e59;
+    background:#1f4442;
 
 }
 @media(max-width:768px){
 
-.hero{
+.hero h1{
 
-    height:75vh;
+font-size:2.6rem;
+
+}
 
 }
 
@@ -179,6 +207,7 @@ header{
 }
 
 }
+
 /* ==========================
    ABOUT SECTION
 ========================== */
