@@ -45,13 +45,30 @@ header{
 
 }
 .logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
 
-    font-size:24px;
+    font-size:2rem;
+    font-weight:700;
+    color:#0c7775;
+    text-decoration:none;
+}
+.logo img{
+    width:60px;
+    height:60px;
 
-    font-weight:bold;
+    object-fit:contain;
 
-    color:#0f766e;
+    border-radius:50%;
 
+    background:#fff;
+
+    padding:3px;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+    transition:.3s;
 }
 .nav-links{
 
