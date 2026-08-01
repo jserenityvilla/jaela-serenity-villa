@@ -49,11 +49,25 @@ header{
     align-items:center;
     gap:12px;
 
+    text-decoration:none;
+    color:#0c7775;
+
     font-size:2rem;
     font-weight:700;
-    color:#0c7775;
-    text-decoration:none;
+
+    white-space:nowrap;
 }
+.logo:hover{
+    opacity:0.9;
+}
+
+.logo span:hover{
+    color:#0a5f5d;
+}
+.logo{
+    cursor:pointer;
+}
+
 .logo img{
     width:60px;
     height:60px;
