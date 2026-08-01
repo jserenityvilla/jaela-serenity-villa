@@ -971,3 +971,7 @@ font-size:2.6rem;
     background:#115e59;
 
 }
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+}
