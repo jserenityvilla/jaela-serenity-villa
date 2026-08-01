@@ -38,15 +38,16 @@ header{
 .logo{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:10px;
 
     text-decoration:none;
     color:#0c7775;
 
-    font-size:2rem;
+    font-size:1.5rem;   /* Was 2rem */
     font-weight:700;
 
     white-space:nowrap;
+    flex-shrink:0;
 }
 
 .logo span {
@@ -66,36 +67,27 @@ header{
 }
 
 .logo img{
-    width:45px;
-    height:45px;
-    margin-right: 12px;
-
-    object-fit:contain;
-
+    width:50px;
+    height:50px;
     border-radius:50%;
-
-    background:#fff;
-
-    padding:3px;
-
-    box-shadow:0 5px 15px rgba(0,0,0,.15);
-
-    transition:.3s;
 }
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.nav-links{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    flex-wrap:nowrap;
+    gap:16px;
+    list-style:none;
+    margin:0;
+    padding:0;
+
+    flex:1;
+    white-space:nowrap;
 }
 
-
-.nav-links a {
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
+.nav-links a{
+    font-size:15px;
+    font-weight:600;
 }
 .nav-links a:hover{
 
