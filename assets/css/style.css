@@ -960,3 +960,17 @@ html {
     scroll-behavior: smooth;
     scroll-padding-top: 90px;
 }
+/* Fix sticky navigation covering section headings */
+
+#welcome,
+#about,
+#checkin,
+#wifi,
+#house,
+#appliances,
+#kitchen,
+#nearby,
+#checkout,
+#contact{
+    scroll-margin-top:110px;
+}
