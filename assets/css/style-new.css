@@ -162,9 +162,7 @@ header{
     margin-top: 15px;
 
 }
-/*=========================================
-  4. HERO
-=========================================*/
+
 /*==================================
 4. HERO
 ==================================*/
@@ -179,8 +177,11 @@ header{
     display:flex;
     justify-content:center;
     align-items:center;
-
     text-align:center;
+}
+.hero{
+    padding:120px 20px 80px;
+    box-sizing:border-box;
 }
 
 .hero::before{
