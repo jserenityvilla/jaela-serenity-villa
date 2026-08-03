@@ -132,6 +132,10 @@ header{
     flex-wrap:nowrap;
 }
 
+.nav-links li{
+    list-style:none;
+}
+
 .nav-links a{
     text-decoration:none;
     color:#333;
@@ -153,15 +157,6 @@ header{
 
 }
 
-.nav-links {
-
-    flex-wrap: wrap;
-
-    justify-content: center;
-
-    margin-top: 15px;
-
-}
 
 /*==================================
 4. HERO
@@ -1078,4 +1073,32 @@ header{
 .contact-note p{
     color:#555;
     line-height:1.8;
+}
+/* ===========================
+   Mobile Navigation
+=========================== */
+
+@media (max-width:768px){
+
+    .navbar{
+        padding:12px 18px;
+    }
+
+    .logo img{
+        height:42px;
+    }
+
+    .logo span{
+        font-size:1.5rem;
+    }
+
+    .nav-links{
+        display:none;
+    }
+
+    .hero{
+        padding-top:90px;
+        min-height:auto;
+    }
+
 }
