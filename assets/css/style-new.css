@@ -167,7 +167,9 @@ header{
     min-height:100vh;
 
     background:url("../images/hero.jpg") center center/cover no-repeat;
-    background-size:cover;
+    background-size:contain;
+ 
+    background-color:#fff;
     background-position:center;
     display:flex;
     justify-content:center;
