@@ -1,1106 +1,2720 @@
-/*==================================================
-    JA-ELA SERENITY VILLA
-==================================================*/
+/* =========================================
+   JA-ELA SERENITY VILLA
+   MAIN WEBSITE STYLESHEET
+   ========================================= */
 
-/*==============================
-  1. RESET
-==============================*/
+/* =========================================
+   GLOBAL
+   ========================================= */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
-/*==============================
-  2. GLOBAL
-==============================*/
-
-html{
-    scroll-behavior:smooth;
-    scroll-padding-top:90px;
+html {
+    scroll-behavior: smooth;
 }
 
-body{
-    font-family:'Poppins',sans-serif;
-    background:#f8fafc;
-    color:#333;
-    line-height:1.6;
-    overflow-x:hidden;
+section {
+    scroll-margin-top: 90px;
 }
 
-img{
-    max-width:100%;
-    display:block;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", Arial, Helvetica, sans-serif;
+    background: #f8f6ef;
+    color: #26382c;
+    line-height: 1.6;
 }
 
-a{
-    text-decoration:none;
+img {
+    max-width: 100%;
 }
 
-ul{
-    list-style:none;
+a {
+    color: inherit;
 }
 
-.container{
-    width:90%;
-    max-width:1200px;
-    margin:auto;
+/* =========================================
+   MAIN CONTAINER
+   ========================================= */
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
 }
 
-section{
-    padding:100px 20px;
-    scroll-margin-top:90px;
-}
-/*==============================
-  3. Header navigation
-==============================*/
-header{
-    position: fixed;
-    width:100%;
-    top:0;
-    left:0;
-    z-index:1000;
-}
+/* =========================================
+   HEADER
+   ========================================= */
+
 .navbar {
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
+    z-index: 1000;
+
     width: 100%;
 
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
 
-    padding: 15px 60px;
-    background: #ffffff;
-    padding: 15px 30px;
-    box-shadow: 0 2px 15px rgba(0,0,0,.08);
+    gap: 25px;
 
-    z-index: 1000;
-}
+    padding: 14px 30px;
 
-.logo{
-    display:flex;
-    align-items:center;
-    gap:15px;
+    background: rgba(255, 255, 255, 0.97);
 
-    text-decoration:none;
-    color:#0c7775;
+    border-bottom: 1px solid #e5e0d5;
 
-    white-space:nowrap;
-}
-.logo img{
-    width:70px;
-    height:70px;
-    border-radius:50%;
-}
-
-.logo span{
-    font-size:2rem;
-    font-weight:700;
-}
-
-
-.logo:hover {
-    opacity: 0.9;
-}
-
-.logo span:hover {
-    color: #0a5f5d;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .logo {
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    text-decoration: none;
+
+    color: #087F86;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    white-space: nowrap;
 }
 
 .logo img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+
+    object-fit: contain;
 }
 
-.nav-links{
-    display:flex;
-    align-items:center;
-    gap:28px;
-
-    list-style:none;
-    margin:0;
-    padding:0;
-
-    flex-wrap:nowrap;
+.logo span {
+    font-size: 20px;
+    font-style: italic;
 }
 
-.nav-links li{
-    list-style:none;
+.nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
 }
 
-.nav-links a{
-    text-decoration:none;
-    color:#333;
-    font-weight:600;
-    white-space:nowrap;
-}
-.nav-links a:hover{
-    color:#0c7775;
-}
+.nav-links a {
+    text-decoration: none;
 
+    color: #34483a;
 
-@media(max-width:768px) {
+    font-size: 13px;
+    font-weight: 500;
 
-    .hero h1 {
-
-        font-size: 2.6rem;
-
-    }
-
+    transition: color 0.2s ease;
 }
 
-
-/*==================================
-4. HERO
-==================================*/
-
-.hero{
-    position:relative;
-    min-height:100vh;
-
-    background:url("../images/hero.jpg") center center/cover no-repeat;
-    background-size:contain;
- 
-    background-color:#fff;
-    background-position:center;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-}
-.hero{
-    padding:100px 20px 60px;
-    box-sizing:border-box;
+.nav-links a:hover {
+    color: #087F86;
 }
 
-.hero::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,.45);
+.book-btn {
+    display: inline-block;
+
+    padding: 10px 18px;
+
+    background: #087F86;
+    color: #ffffff;
+
+    border-radius: 25px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
-.hero-overlay{
-    position:relative;
-    z-index:2;
-
-    max-width:850px;
-    padding:20px;
-
-    color:#fff;
+.book-btn:hover {
+    background: #075F65;
+    transform: translateY(-1px);
 }
 
-.hero-overlay h1{
-    max-width: 800px;
+/* =========================================
+   HERO
+   ========================================= */
+
+.hero {
+    position: sticky;
+    top: 60px;
+    z-index: 10;
+
     width: 100%;
-    font-size:3.2rem;
+    min-height: 560px;
+
+    display: flex;
+    align-items: center;
+
+    background-image:
+        linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0.32) 0%,
+            rgba(0, 0, 0, 0.18) 40%,
+            rgba(0, 0, 0, 0.05) 75%,
+            rgba(0, 0, 0, 0.02) 100%
+        ),
+        url("../images/hero-night1.jpg");
+
+    background-size: cover;
+    background-position: 55% center;
+    background-repeat: no-repeat;
+
+    color: #ffffff;
+
+    overflow: hidden;
+}
+
+/* =========================================
+   HERO CONTENT
+   ========================================= */
+
+.hero-overlay {
+    position: relative;
+
+    width: 100%;
+    max-width: 1350px;
+
+    margin: 0 auto;
+
+    padding: 75px 60px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
     text-align: center;
-    line-height:1.3;
-    margin-bottom:20px;
 }
 
-.hero-overlay p{
+/* =========================================
+   HERO HEADING
+   ========================================= */
 
-    font-size:1.2rem;
+.hero h1 {
+    max-width: 850px;
 
-    margin-bottom:35px;
+    margin: 0 auto 18px;
+
+    font-size: clamp(44px, 4.5vw, 64px);
+
+    line-height: 1.08;
+
+    font-weight: 700;
+
+    color: #ffffff;
+
+    text-align: center;
+
+    text-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.55);
 }
 
-.hero-buttons{
+/* =========================================
+   HERO DESCRIPTION
+   ========================================= */
 
-    display:flex;
+.hero p {
+    max-width: 650px;
 
-    justify-content:center;
+    margin: 0 auto 25px;
 
-    gap:20px;
+    font-size: 15px;
 
-    flex-wrap:wrap;
+    line-height: 1.5;
+
+    color: #ffffff;
+
+    text-align: center;
+
+    text-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.55);
 }
 
-.hero-button{
+.hero-tagline {
+    max-width: 700px;
 
-    display:inline-block;
+    margin: 0 auto 10px;
 
-    padding:14px 35px;
+    font-size: 17px;
 
-    background:#0c7775;
+    line-height: 1.5;
 
-    color:white;
-
-    border-radius:40px;
-
-    font-weight:600;
-
-    transition:.3s;
+    font-weight: 500;
 }
 
-.hero-button:hover{
+.hero-description {
+    max-width: 650px;
 
-    background:#095d5b;
+    margin: 0 auto 25px;
 
-    transform:translateY(-3px);
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    font-weight: 400;
 }
 
-/*==================================
-5. ABOUT
-==================================*/
-
-.about{
-    padding:100px 20px;
-    background:#f8fafc;
+.hero-accent {
+    color: #3A9AA8;
 }
 
-.about .container{
-    max-width:1200px;
-    margin:0 auto;
+/* =========================================
+   HERO BUTTONS
+   ========================================= */
+
+.hero-buttons {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 14px;
+
+    flex-wrap: wrap;
 }
 
-.about h2{
-    text-align:center;
-    font-size:3rem;
-    color:#0c7775;
-    margin-bottom:25px;
+.hero-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 135px;
+
+    padding: 13px 25px;
+
+    border-radius: 30px;
+
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+
+    background: rgba(46, 91, 58, 0.95);
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.25);
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
-.about-intro{
-    text-align:center;
-    max-width:900px;
-    margin:0 auto 60px;
-    color:#666;
-    font-size:1.15rem;
-    line-height:1.8;
+.hero-button:hover {
+    background: #075F65;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-.features{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:30px;
+.hero-buttons .hero-button:nth-child(2) {
+    background: rgba(46, 91, 58, 0.95);
+
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+
+    color: #ffffff;
 }
 
-.feature-card{
-    background:#fff;
-    border-top:4px solid #0f7c85;
-    padding:30px;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:.3s;
+/* =========================================
+   GENERAL SECTIONS
+   ========================================= */
 
-    display:flex;
-    flex-direction:column;
-
-    min-height:190px;
-    
+section:not(.hero) {
+    padding: 55px 0;
 }
 
-.feature-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
+section:nth-of-type(even) {
+    background: #ffffff;
 }
 
-.feature-card h3{
-    color:#0f7c85;
-    font-size:1.45rem;
-    margin-bottom:15px;
+/* =========================================
+   SECTION HEADINGS
+   ========================================= */
+
+section h2 {
+    margin: 0 0 18px;
+
+    font-size: 34px;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    color: #087F86;
+
+    text-align: center;
 }
 
-.feature-card p{
-    color:#555;
-    line-height:1.7;
-}
-@media (max-width:900px){
+.section-description {
+    max-width: 700px;
 
-    .features{
-        grid-template-columns:1fr 1fr;
+    margin: 0 auto 35px;
+
+    text-align: center;
+
+    color: #6c756e;
+
+    font-size: 15px;
+}
+
+/* =========================================
+   COMMON TILE / GRID WIDTH
+   ========================================= */
+
+.features,
+.checkin-grid,
+.wifi-grid,
+.rules-grid,
+.appliance-grid,
+.kitchen-grid,
+.nearby-grid,
+.checkout-grid,
+.contact-grid {
+    width: 100%;
+    max-width: 1300px;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    box-sizing: border-box;
+}
+
+/* =========================================
+   ABOUT
+   ========================================= */
+
+.about {
+    background: #f8f6ef;
+}
+
+.about-intro {
+    max-width: 850px;
+
+    margin: 0 auto;
+
+    text-align: center;
+
+    line-height: 1.6;
+}
+
+.about .container {
+    width: 100%;
+    max-width: 1400px;
+
+    margin: 0 auto;
+
+    box-sizing: border-box;
+}
+
+/* =========================================
+   ABOUT FEATURE GRID
+   ========================================= */
+
+.features {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 30px;
+
+    margin-top: 40px;
+}
+
+/* =========================================
+   COMMON CARD BASE
+   ========================================= */
+
+.feature-card,
+.check-card,
+.wifi-card,
+.rule-card,
+.appliance-card,
+.kitchen-card,
+.nearby-card,
+.checkout-card,
+.contact-card {
+    box-sizing: border-box;
+
+    border-radius: 16px;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+/* =========================================
+   ABOUT FEATURE CARDS
+   ========================================= */
+
+.feature-card {
+    position: relative;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    border-top: 3px solid #3A9AA8;
+
+    border-radius: 16px;
+
+    padding: 30px 28px;
+
+    min-height: 135px;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.feature-card h3 {
+    margin: 0 0 14px;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    color: #087F86;
+}
+
+.feature-card p {
+    margin: 0;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+    color: #555555;
+}
+
+/* =========================================
+   CHECK-IN
+   ========================================= */
+
+.checkin {
+    background: #ffffff;
+
+    padding: 55px 0;
+}
+
+.checkin-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 30px;
+
+    margin-top: 40px;
+}
+
+.check-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #f8f6ef;
+
+    border: 1px solid #e5e0d5;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.check-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.check-card h3 {
+    margin-top: 0;
+
+    margin-bottom: 12px;
+
+    color: #087F86;
+
+    font-size: 18px;
+}
+
+.check-card p {
+    margin-bottom: 0;
+
+    color: #626c65;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+/* =========================================
+   WIFI
+   ========================================= */
+
+.wifi {
+    background: #f8f6ef;
+}
+
+.wifi-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+.wifi-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    text-align: center;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.07);
+}
+
+.wifi-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.11);
+}
+
+.wifi-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+
+    color: #087F86;
+
+    font-size: 17px;
+}
+
+.wifi-card p {
+    margin-bottom: 0;
+
+    color: #69726c;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+/* =========================================
+   COMMON INFORMATION NOTES
+   ========================================= */
+
+.wifi-note,
+.rules-note,
+.appliance-note,
+.kitchen-note,
+.nearby-note,
+.checkout-note,
+.contact-note {
+    max-width: 900px;
+
+    margin: 35px auto 0;
+
+    padding: 22px 25px;
+
+    background: #ffffff;
+
+    border-left: 4px solid #087F86;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.wifi-note strong,
+.rules-note strong,
+.appliance-note strong,
+.kitchen-note strong,
+.nearby-note strong,
+.checkout-note strong,
+.contact-note strong {
+    color: #087F86;
+}
+
+/* =========================================
+   HOUSE RULES
+   ========================================= */
+
+.house-rules {
+    background: #ffffff;
+}
+
+.rules-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+.rule-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #f8f6ef;
+
+    border: 1px solid #e5e0d5;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.rule-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.rule-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #087F86;
+
+    font-size: 18px;
+}
+
+.rule-card p {
+    margin-bottom: 0;
+
+    color: #69726c;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+/* =========================================
+   APPLIANCES
+   ========================================= */
+
+.appliance-guide {
+    background: #f8f6ef;
+}
+
+.appliance-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+.appliance-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.appliance-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.appliance-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #087F86;
+
+    font-size: 18px;
+}
+
+.appliance-card p {
+    margin-bottom: 0;
+
+    color: #69726c;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+/* =========================================
+   KITCHEN
+   ========================================= */
+
+.kitchen {
+    background: #ffffff;
+}
+
+.kitchen-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+.kitchen-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #f8f6ef;
+
+    border: 1px solid #e5e0d5;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.kitchen-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.kitchen-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #087F86;
+
+    font-size: 18px;
+}
+
+.kitchen-card p {
+    margin-bottom: 0;
+
+    color: #69726c;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+/* =========================================
+   NEARBY
+   ========================================= */
+
+.nearby {
+    background: #f8f6ef;
+}
+
+.nearby-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+.nearby-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.06);
+
+    text-align: center;
+}
+
+.nearby-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.nearby-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #087F86;
+
+    font-size: 18px;
+}
+
+.nearby-card p {
+    margin-bottom: 0;
+
+    color: #69726c;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.location-button {
+    display: inline-block;
+
+    margin-top: 12px;
+
+    padding: 9px 16px;
+
+    border-radius: 20px;
+
+    background: #087F86;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.location-button:hover {
+    background: #075F65;
+
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   CHECKOUT
+   ========================================= */
+
+.checkout {
+    background: #ffffff;
+}
+
+.checkout-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+.checkout-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #f8f6ef;
+
+    border: 1px solid #e5e0d5;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.checkout-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.checkout-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #087F86;
+
+    font-size: 17px;
+}
+
+.checkout-card p {
+    margin-bottom: 0;
+
+    color: #69726c;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+/* =========================================
+   CONTACT
+   ========================================= */
+
+.contact {
+    background: #f8f6ef;
+}
+
+.contact-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+.contact-card {
+    position: relative;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    border-top: 3px solid #3A9AA8;
+
+    min-height: 145px;
+
+    text-align: center;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.contact-card:hover {
+    transform: translateY(-4px);
+
+    border-top-color: #3A9AA8;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.contact-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #087F86;
+
+    font-size: 18px;
+}
+
+.contact-card p {
+    margin-bottom: 0;
+
+    color: #69726c;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.contact-card a {
+    color: #087F86;
+
+    text-decoration: none;
+
+    font-weight: 500;
+}
+
+.contact-button {
+    display: inline-block;
+
+    margin-top: 8px;
+
+    padding: 10px 18px;
+
+    border-radius: 22px;
+
+    background: #087F86;
+
+    color: #ffffff !important;
+
+    text-decoration: none !important;
+
+    font-size: 13px;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.contact-button:hover {
+    background: #075F65;
+
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   MAP
+   ========================================= */
+
+.map-container {
+    width: 100%;
+
+    max-width: 1100px;
+
+    height: 400px;
+
+    margin: 40px auto 0;
+
+    overflow: hidden;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 100%;
+
+    border: 0;
+}
+
+/* =========================================
+   PAGE SECTIONS
+   ========================================= */
+
+.about,
+.checkin,
+.wifi,
+.house-rules,
+.appliance-guide,
+.kitchen,
+.nearby,
+.checkout,
+.contact {
+    position: relative;
+
+    z-index: 20;
+
+    background: #ffffff;
+}
+
+/* =========================================
+   MOBILE NAVIGATION
+   ========================================= */
+
+@media (max-width: 1000px) {
+
+    .navbar {
+        flex-wrap: wrap;
+
+        justify-content: center;
+
+        padding: 12px 20px;
     }
 
-}
+    .logo {
+        width: 100%;
 
-@media (max-width:600px){
-
-    .features{
-        grid-template-columns:1fr;
+        justify-content: center;
     }
 
-    .about h2{
-        font-size:2.2rem;
+    .nav-links {
+        order: 3;
+
+        width: 100%;
+
+        flex-wrap: wrap;
+
+        gap: 12px 18px;
+    }
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 900px) {
+
+    .container {
+        padding: 0 25px;
     }
 
-}
-@media (max-width: 768px) {
+    .features,
+    .rules-grid,
+    .appliance-grid,
+    .kitchen-grid,
+    .nearby-grid,
+    .checkout-grid,
+    .contact-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .wifi-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .checkin-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
 
     .hero {
-        min-height: auto;
-        padding: 100px 20px 50px;
+        min-height: 520px;
     }
 
     .hero-overlay {
-        padding: 20px;
+        padding: 65px 40px;
     }
 
     .hero h1 {
-        font-size: 2rem;
-        line-height: 1.3;
+        max-width: 560px;
+
+        font-size: 44px;
+    }
+        .gallery-preview-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 20px;
+    }
+
+    .gallery-preview-item {
+        height: 230px;
+    }
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 0 20px;
+    }
+
+    section:not(.hero) {
+        padding: 45px 0;
+    }
+
+    section h2 {
+        font-size: 28px;
+    }
+
+    .section-description {
+        font-size: 14px;
+
+        margin-bottom: 25px;
+    }
+
+    .navbar {
+        padding: 10px 15px;
+    }
+
+    .logo img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .logo span {
+        font-size: 17px;
+    }
+
+    .nav-links {
+        gap: 8px 12px;
+    }
+
+    .nav-links a {
+        font-size: 11px;
+    }
+
+    .book-btn {
+        padding: 8px 14px;
+
+        font-size: 12px;
+    }
+        .gallery-preview {
+        padding: 45px 0;
+    }
+
+    .gallery-preview-grid {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+    .gallery-preview-item {
+        height: 240px;
+    }
+
+    /* =====================================
+       HERO — MOBILE
+       ===================================== */
+
+    .hero {
+        position: relative;
+
+        width: 100%;
+
+        min-height: 650px;
+
+        display: flex;
+        align-items: center;
+
+        background-image:
+            linear-gradient(
+                90deg,
+                rgba(0, 0, 0, 0.38) 0%,
+                rgba(0, 0, 0, 0.20) 38%,
+                rgba(0, 0, 0, 0.05) 70%,
+                rgba(0, 0, 0, 0.02) 100%
+            ),
+            url("../images/hero-night.jpg");
+
+        background-size: cover;
+
+        background-position: center 20%;
+
+        background-repeat: no-repeat;
+
+        color: #ffffff;
+
+        overflow: hidden;
+    }
+
+    .hero-overlay {
+        width: 100%;
+
+        max-width: 1350px;
+
+        padding: 55px 22px;
+
+        align-items: center;
+
+        text-align: center;
+    }
+
+    .hero h1 {
+        max-width: 100%;
+
+        margin-left: auto;
+        margin-right: auto;
+
+        font-size: 35px;
+
+        line-height: 1.15;
+
+        text-align: center;
     }
 
     .hero p {
-        font-size: 1rem;
+        max-width: 100%;
+
+        font-size: 14px;
+
+        text-align: center;
+    }
+
+    .hero-tagline {
+        font-size: 15px;
+    }
+
+    .hero-description {
+        font-size: 13px;
     }
 
     .hero-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+        justify-content: center;
     }
 
     .hero-button {
-        width: 100%;
-    }
-}
-/*==================================
-6. CHECK-IN
-==================================*/
+        min-width: 125px;
 
-.checkin{
-    padding:70px 20px 100px;
-    background:#ffffff;
-}
-
-.checkin .container{
-    max-width:1200px;
-    margin:0 auto;
-}
-
-.checkin h2{
-    text-align:center;
-    font-size:3.2rem;
-    color:#0c7775;
-    margin-bottom:20px;
-    font-weight:700;
-}
-
-.checkin .section-description{
-    text-align:center;
-    max-width:800px;
-    margin:0 auto 60px;
-    color:#666;
-    font-size:1.15rem;
-    line-height:1.8;
-}
-
-.checkin-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap: 35px;
-}
-
-.check-card{
-    background:#ffffff;
-    border-radius:18px;
-    padding:35px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:all .3s ease;
-    border-top:5px solid #0c7775;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    height:100%;
-}
-
-.check-card:hover{
-    transform:translateY(-10px);
-    box-shadow:0 22px 45px rgba(0,0,0,.15);
-}
-.check-card h3{
-    font-size:1.6rem;
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.check-card p{
-    color:#555;
-    line-height:1.8;
-    margin-bottom:12px;
-}
-
-.check-card strong{
-    color:#333;
-}
-@media (max-width:900px){
-
-    .checkin-grid{
-        grid-template-columns:1fr;
+        padding: 12px 20px;
     }
 
-    .checkin h2{
-        font-size:2.4rem;
+    /* =====================================
+       MOBILE GRIDS
+       ===================================== */
+
+    .features,
+    .checkin-grid,
+    .wifi-grid,
+    .rules-grid,
+    .appliance-grid,
+    .kitchen-grid,
+    .nearby-grid,
+    .checkout-grid,
+    .contact-grid {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+
+        margin-top: 30px;
     }
 
-}
-.wifi-list{
-    list-style:none;
-    margin:25px 0;
-    padding:0;
+    /* =====================================
+       MOBILE CARDS
+       ===================================== */
+
+    .feature-card,
+    .check-card,
+    .wifi-card,
+    .rule-card,
+    .appliance-card,
+    .kitchen-card,
+    .nearby-card,
+    .checkout-card,
+    .contact-card {
+        min-height: auto;
+
+        padding: 24px;
+    }
+
+    .feature-card h3,
+    .check-card h3,
+    .rule-card h3,
+    .appliance-card h3,
+    .kitchen-card h3,
+    .nearby-card h3,
+    .contact-card h3 {
+        font-size: 17px;
+    }
+
+    .feature-card p,
+    .check-card p,
+    .rule-card p,
+    .appliance-card p,
+    .kitchen-card p,
+    .nearby-card p,
+    .checkout-card p,
+    .contact-card p {
+        font-size: 13px;
+    }
+
+    /* =====================================
+       MOBILE NOTES
+       ===================================== */
+
+    .wifi-note,
+    .rules-note,
+    .appliance-note,
+    .kitchen-note,
+    .nearby-note,
+    .checkout-note,
+    .contact-note {
+        margin-top: 25px;
+
+        padding: 18px;
+    }
+
+    /* =====================================
+       MOBILE MAP
+       ===================================== */
+
+    .map-container {
+        height: 320px;
+
+        margin-top: 30px;
+
+        border-radius: 12px;
+    }
+    /* =========================================
+   GALLERY PREVIEW
+   ========================================= */
+
+.gallery-preview {
+    background: #ffffff;
+    padding: 65px 0;
 }
 
-.wifi-list li{
-    padding:10px 0;
-    color:#555;
-    border-bottom:1px solid #eee;
-    font-size:1rem;
+.gallery-preview .section-description {
+    max-width: 700px;
+    margin: 0 auto 40px;
 }
 
-.wifi-list li:last-child{
-    border-bottom:none;
+
+/* =========================================
+   GALLERY GRID
+   ========================================= */
+
+.gallery-preview-grid {
+    width: 100%;
+    max-width: 1300px;
+
+    margin: 0 auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 22px;
 }
 
-.wifi-note{
-    margin-top:25px;
-    padding:18px;
-    background:#eef8f7;
-    border-left:5px solid #0c7775;
-    border-radius:10px;
-    color:#444;
-    line-height:1.7;
+
+/* =========================================
+   GALLERY IMAGE CARD
+   ========================================= */
+
+.gallery-preview-item {
+    position: relative;
+
+    display: block;
+
+    height: 240px;
+
+    overflow: hidden;
+
+    border-radius: 16px;
+
+    text-decoration: none;
+
+    background: #f8f6ef;
+
+    box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.10);
+
+    border: 1px solid #eeeeee;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
 }
-.wifi h2{
-    font-size:48px;
-    color:#0b7a83;
-    text-align:center;
-    margin-bottom:20px;
-}
-.wifi .section-description{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 60px;
-    color:#666;
-    font-size:18px;
+
+
+.gallery-preview-item:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.16);
 }
 
-.wifi-grid{
 
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+/* =========================================
+   GALLERY IMAGE
+   ========================================= */
 
-    gap:25px;
+.gallery-preview-item img {
+    width: 100%;
+    height: 100%;
 
-    margin-top:50px;
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.4s ease;
+}
+
+
+.gallery-preview-item:hover img {
+    transform: scale(1.06);
+}
+
+
+/* =========================================
+   IMAGE LABEL
+   ========================================= */
+
+.gallery-preview-item span {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 18px 16px 16px;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(0, 0, 0, 0.72)
+        );
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    text-align: left;
+}
+
+
+/* =========================================
+   VIEW ALL PHOTOS BUTTON
+   ========================================= */
+
+.gallery-preview-button {
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 38px;
+}
+
+
+.gallery-view-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 13px 28px;
+
+    background: #087F86;
+
+    color: #ffffff;
+
+    border-radius: 28px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.15);
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.gallery-view-button:hover {
+    background: #075F65;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.20);
+}
+/* =========================================
+   VILLA GALLERY PREVIEW
+   ========================================= */
+
+.gallery-preview {
+    width: 100%;
+    background: #ffffff;
+    padding: 65px 0;
+}
+
+.gallery-preview .container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.gallery-preview h2 {
+    margin: 0 0 15px;
+    text-align: center;
+    color: #087F86;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.gallery-preview .section-description {
+    max-width: 700px;
+    margin: 0 auto 40px;
+    text-align: center;
+    color: #6c756e;
+    font-size: 15px;
+}
+
+
+/* =========================================
+   GALLERY GRID
+   ========================================= */
+
+.gallery-preview-grid {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 22px;
+}
+
+
+/* =========================================
+   GALLERY CARD
+   ========================================= */
+
+.gallery-preview-item {
+    position: relative;
+
+    display: block;
+
+    width: 100%;
+    height: 240px;
+
+    overflow: hidden;
+
+    border-radius: 16px;
+
+    background: #f8f6ef;
+
+    border: 1px solid #eeeeee;
+
+    box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.10);
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.gallery-preview-item:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.16);
+}
+
+
+/* =========================================
+   GALLERY IMAGE
+   ========================================= */
+
+.gallery-preview-item img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.4s ease;
+}
+
+.gallery-preview-item:hover img {
+    transform: scale(1.06);
+}
+
+
+/* =========================================
+   PHOTO TITLE
+   ========================================= */
+
+.gallery-preview-item span {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: block;
+
+    padding: 45px 16px 16px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0, 0, 0, 0.75) 100%
+        );
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    text-align: left;
+}
+
+
+/* =========================================
+   VIEW ALL PHOTOS
+   ========================================= */
+
+.gallery-preview-button {
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 40px;
+}
+
+.gallery-view-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 13px 28px;
+
+    background: #087F86;
+
+    color: #ffffff;
+
+    border-radius: 28px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.15);
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+.gallery-view-button:hover {
+    background: #075F65;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 900px) {
+
+    .gallery-preview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .gallery-preview-item {
+        height: 230px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .gallery-preview {
+        padding: 45px 0;
+    }
+
+    .gallery-preview .container {
+        padding: 0 20px;
+    }
+
+    .gallery-preview-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .gallery-preview-item {
+        height: 240px;
+    }
+
+    .gallery-preview h2 {
+        font-size: 28px;
+    }
+}
+}
+
+/* =========================================
+   JA-ELA SERENITY VILLA - FINAL BLUE/TEAL THEME
+   ========================================= */
+
+:root {
+    --villa-blue: #087F86;
+    --villa-blue-dark: #075F65;
+    --villa-blue-light: #3A9AA8;
+    --villa-card-border: #3A9AA8;
+    --villa-card-bg: #ffffff;
+}
+
+/* Hero accent */
+.hero-accent {
+    color: var(--villa-blue-light) !important;
+    font-weight: 900 !important;
+    text-shadow:
+        0 3px 5px rgba(0, 0, 0, 0.65),
+        0 5px 15px rgba(0, 0, 0, 0.40);
+}
+
+/* Hero buttons */
+.hero-button,
+.hero-buttons .hero-button:nth-child(2) {
+    background: rgba(8, 127, 134, 0.96) !important;
+    border-color: rgba(255, 255, 255, 0.95) !important;
+    color: #ffffff !important;
+}
+
+.hero-button:hover,
+.hero-buttons .hero-button:nth-child(2):hover {
+    background: var(--villa-blue-dark) !important;
+}
+
+/* All main-site information tiles use one consistent style */
+.feature-card,
+.check-card,
+.wifi-card,
+.rule-card,
+.appliance-card,
+.kitchen-card,
+.nearby-card,
+.checkout-card,
+.contact-card {
+    background: var(--villa-card-bg) !important;
+    border: 1px solid var(--villa-card-border) !important;
+    border-top: 1px solid var(--villa-card-border) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.feature-card:hover,
+.check-card:hover,
+.wifi-card:hover,
+.rule-card:hover,
+.appliance-card:hover,
+.kitchen-card:hover,
+.nearby-card:hover,
+.checkout-card:hover,
+.contact-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--villa-blue) !important;
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Consistent tile headings */
+.feature-card h3,
+.check-card h3,
+.wifi-card h3,
+.rule-card h3,
+.appliance-card h3,
+.kitchen-card h3,
+.nearby-card h3,
+.checkout-card h3,
+.contact-card h3 {
+    color: var(--villa-blue) !important;
+}
+
+/* Main section headings */
+section h2,
+.gallery-preview h2 {
+    color: var(--villa-blue) !important;
+}
+
+/* Gallery preview tile borders */
+.gallery-preview-item {
+    border: 1px solid var(--villa-card-border) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Gallery View All Photos button */
+.gallery-view-button {
+    background: var(--villa-blue) !important;
+    color: #ffffff !important;
+}
+
+.gallery-view-button:hover {
+    background: var(--villa-blue-dark) !important;
+}
+
+/* Main navigation / booking button accents */
+.book-btn {
+    background: var(--villa-blue) !important;
+    color: #ffffff !important;
+}
+
+.book-btn:hover {
+    background: var(--villa-blue-dark) !important;
+}
+
+
+/* =========================================
+   HERO TITLE - PROMINENT TEAL ACCENT
+   ========================================= */
+
+.hero h1 {
+    font-size: 58px !important;
+    line-height: 1.05 !important;
+    font-weight: 800 !important;
+    letter-spacing: -1px;
+    text-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.65),
+        0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 600px) {
+    .hero h1 {
+        font-size: 36px !important;
+        line-height: 1.08 !important;
+        letter-spacing: -0.5px;
+    }
+}
+
+/* =========================================================
+   JA-ELA SERENITY VILLA — FINAL BLUE THEME
+   Primary colour: #1E90FF
+   ========================================================= */
+
+:root {
+    --villa-blue: #1E90FF;
+    --villa-blue-dark: #1877CC;
+    --villa-blue-light: #D6EAFB;
+    --villa-blue-pale: #F4F8FF;
+    --villa-text: #333333;
+    --villa-white: #FFFFFF;
+}
+
+/* ---------------------------------------------------------
+   GENERAL
+   --------------------------------------------------------- */
+
+body {
+    color: var(--villa-text);
+}
+
+section h2,
+section h3,
+.gallery-preview h2 {
+    color: var(--villa-blue) !important;
+}
+
+/* ---------------------------------------------------------
+   HERO
+   --------------------------------------------------------- */
+
+.hero-accent {
+    color: var(--villa-blue) !important;
+    font-weight: 900 !important;
+    text-shadow:
+        0 3px 5px rgba(0,0,0,.65),
+        0 5px 15px rgba(0,0,0,.40);
+}
+
+/* Hero buttons */
+.hero-button,
+.hero-buttons .hero-button,
+.hero-buttons .hero-button:nth-child(2) {
+    background: var(--villa-blue) !important;
+    border: 1.5px solid #FFFFFF !important;
+    color: #FFFFFF !important;
+}
+
+.hero-button:hover,
+.hero-buttons .hero-button:hover,
+.hero-buttons .hero-button:nth-child(2):hover {
+    background: var(--villa-blue-dark) !important;
+    border-color: #FFFFFF !important;
+}
+
+/* ---------------------------------------------------------
+   INFORMATION TILES
+   --------------------------------------------------------- */
+
+.feature-card,
+.check-card,
+.wifi-card,
+.rule-card,
+.appliance-card,
+.kitchen-card,
+.nearby-card,
+.checkout-card,
+.contact-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E1E8EF !important;
+    border-top: 3px solid var(--villa-blue-light) !important;
+    border-radius: 15px !important;
+    box-shadow: 0 8px 25px rgba(30,60,75,.10) !important;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-top-color .25s ease;
+}
+
+.feature-card:hover,
+.check-card:hover,
+.wifi-card:hover,
+.rule-card:hover,
+.appliance-card:hover,
+.kitchen-card:hover,
+.nearby-card:hover,
+.checkout-card:hover,
+.contact-card:hover {
+    transform: translateY(-3px);
+    border-top-color: var(--villa-blue) !important;
+    box-shadow: 0 12px 30px rgba(30,60,75,.15) !important;
+}
+
+.feature-card h3,
+.check-card h3,
+.wifi-card h3,
+.rule-card h3,
+.appliance-card h3,
+.kitchen-card h3,
+.nearby-card h3,
+.checkout-card h3,
+.contact-card h3 {
+    color: var(--villa-blue) !important;
+}
+
+.feature-card p,
+.check-card p,
+.wifi-card p,
+.rule-card p,
+.appliance-card p,
+.kitchen-card p,
+.nearby-card p,
+.checkout-card p,
+.contact-card p {
+    color: var(--villa-text) !important;
+}
+
+/* ---------------------------------------------------------
+   ALL COMMON BUTTONS
+   --------------------------------------------------------- */
+
+.book-btn,
+.gallery-view-button,
+.location-button,
+.contact-button,
+.btn-primary,
+.primary-btn,
+.button-primary,
+.cta-button {
+    background: var(--villa-blue) !important;
+    border: 1px solid var(--villa-blue) !important;
+    color: #FFFFFF !important;
+}
+
+.book-btn:hover,
+.gallery-view-button:hover,
+.location-button:hover,
+.contact-button:hover,
+.btn-primary:hover,
+.primary-btn:hover,
+.button-primary:hover,
+.cta-button:hover {
+    background: var(--villa-blue-dark) !important;
+    border-color: var(--villa-blue-dark) !important;
+    color: #FFFFFF !important;
+}
+
+/* ---------------------------------------------------------
+   NAVIGATION
+   --------------------------------------------------------- */
+
+nav a:hover,
+nav a.active {
+    color: var(--villa-blue) !important;
+}
+
+/* ---------------------------------------------------------
+   GALLERY PREVIEW
+   --------------------------------------------------------- */
+
+.gallery-preview {
+    background: #FFFFFF !important;
+}
+
+.gallery-preview-grid {
+    width: 100%;
+    max-width: 1100px;
+    margin: 28px auto 0;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+}
+
+.gallery-preview-item {
+    position: relative;
+    display: block !important;
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+    background: #FFFFFF;
+    border: 1px solid #E1E8EF !important;
+    border-top: 3px solid var(--villa-blue-light) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 5px 16px rgba(30,60,75,.10) !important;
+    text-decoration: none !important;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-top-color .25s ease;
+}
+
+.gallery-preview-item img {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: cover !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transition: transform .35s ease;
+}
+
+.gallery-preview-item span {
+    position: absolute;
+    left: 10px;
+    bottom: 9px;
+    z-index: 2;
+    padding: 5px 9px;
+    color: #FFFFFF !important;
+    background: rgba(30,144,255,.90);
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.gallery-preview-item:hover {
+    transform: translateY(-4px);
+    border-top-color: var(--villa-blue) !important;
+    box-shadow: 0 10px 24px rgba(30,60,75,.16) !important;
+}
+
+.gallery-preview-item:hover img {
+    transform: scale(1.05);
+}
+
+.gallery-preview-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+/* ---------------------------------------------------------
+   INFO / NOTE BOXES
+   --------------------------------------------------------- */
+
+.wifi-note,
+.rules-note,
+.appliance-note,
+.kitchen-note,
+.nearby-note,
+.checkout-note,
+.contact-note {
+    border-left-color: var(--villa-blue) !important;
+}
+
+.wifi-note strong,
+.rules-note strong,
+.appliance-note strong,
+.kitchen-note strong,
+.nearby-note strong,
+.checkout-note strong,
+.contact-note strong {
+    color: var(--villa-blue) !important;
+}
+
+/* ---------------------------------------------------------
+   SECTION BACKGROUNDS
+   --------------------------------------------------------- */
+
+.about,
+.check-in,
+.checkout,
+.nearby,
+.contact {
+    background: #FFFFFF !important;
+}
+
+.info-section,
+.light-section {
+    background: var(--villa-blue-pale) !important;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE GALLERY PREVIEW
+   --------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+    .gallery-preview-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .gallery-preview-item {
+        height: 175px;
+    }
+}
+
+@media (max-width: 760px) {
+    .gallery-preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 14px !important;
+    }
+
+    .gallery-preview-item {
+        height: 165px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .gallery-preview-item {
+        height: 130px;
+        border-radius: 9px !important;
+    }
+
+    .gallery-preview-item span {
+        left: 6px;
+        bottom: 6px;
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+}
+/* =========================================
+   FINAL TILE BORDERS - BRIGHT BLUE
+   ========================================= */
+
+.feature-card,
+.check-card,
+.wifi-card,
+.rule-card,
+.appliance-card,
+.kitchen-card,
+.nearby-card,
+.checkout-card,
+.contact-card {
+
+    background: #FFFFFF !important;
+
+    /* Light blue complete border */
+    border: 1px solid #D6EAFB !important;
+
+    /* Bright blue top edge */
+    border-top: 3px solid #1E90FF !important;
+
+    border-radius: 15px !important;
+
+    box-shadow:
+        0 8px 25px rgba(30, 60, 75, 0.10) !important;
+}
+
+
+/* Tile hover */
+.feature-card:hover,
+.check-card:hover,
+.wifi-card:hover,
+.rule-card:hover,
+.appliance-card:hover,
+.kitchen-card:hover,
+.nearby-card:hover,
+.checkout-card:hover,
+.contact-card:hover {
+
+    border: 1px solid #D6EAFB !important;
+
+    border-top: 3px solid #1877CC !important;
+
+    box-shadow:
+        0 12px 30px rgba(30, 60, 75, 0.15) !important;
+}
+
+
+/* Tile headings */
+.feature-card h3,
+.check-card h3,
+.wifi-card h3,
+.rule-card h3,
+.appliance-card h3,
+.kitchen-card h3,
+.nearby-card h3,
+.checkout-card h3,
+.contact-card h3 {
+
+    color: #1E90FF !important;
+}
+/* =========================================
+   STICKY HEADER
+   Keep logo + menu visible while scrolling
+   ========================================= */
+
+header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+}
+
+
+/* Keep the complete header row visible */
+header .container,
+header nav,
+header .header-container {
+    position: relative;
+    z-index: 10000;
+}
+
+
+/* Make sure menu links remain visible */
+header a {
+    position: relative;
+    z-index: 10001;
+}
+
+
+/* Give anchor sections enough room below the header */
+section[id] {
+    scroll-margin-top: 70px;
+}
+/* =========================================================
+   JA-ELA SERENITY VILLA
+   FOOTER
+   ========================================================= */
+
+.site-footer {
+    width: 100%;
+    margin-top: 70px;
+    background: #123F63;
+    color: #ffffff;
+}
+
+
+/* Main footer area */
+
+.footer-container {
     max-width: 1200px;
-    margin:0 auto;
-}
-.wifi-card{
-
-    background:#fff;
-
-    padding:35px;
-
-    border-radius:18px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-    border-top:4px solid #0f7f87;
-
-    transition:.3s;
-
-}
-.wifi-card:hover{
-
-    transform:translateY(-8px);
-
-    box-shadow:0 18px 35px rgba(0,0,0,.15);
-
-}
-.wifi-card p{
-
-    color:#555;
-
-    line-height:1.8;
-
-}
-.wifi-password{
-
-    margin-top:50px;
-
-    background:#eaf8f8;
-
-    border-left:6px solid #0f7f87;
-
-    padding:25px 30px;
-
-    border-radius:12px;
+    margin: 0 auto;
+    padding: 50px 30px 40px;
 
-}
-
-.wifi-password h3{
-
-    color:#0f7f87;
-
-    margin-bottom:10px;
-
-}
-.wifi-note {
-    max-width: 900px;
-    margin: 40px auto 0;
-}
-/* ==========================================
-   HOUSE RULES
-========================================== */
-
-.house-rules{
-    padding:90px 20px;
-    background:#ffffff;
-}
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.3fr;
 
-.rules-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:30px;
-    margin-top:50px;
+    gap: 45px;
 }
 
-.rule-card{
-    background:#fff;
-    padding:30px;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    border-top:4px solid #0f7c85;
-    transition:.3s;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    min-height:190px;
-}
 
-.rule-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-}
+/* Footer headings */
 
-.rule-card h3{
-    color:#0f7c85;
-    margin-bottom:15px;
-    font-size:1.5rem;
-}
+.site-footer h3 {
+    margin: 0 0 15px;
 
-.rule-card p{
-    color:#555;
-    line-height:1.8;
-}
+    color: #ffffff !important;
 
-.rules-note{
-    margin-top:50px;
-    background:#eef9f8;
-    border-left:5px solid #0f7c85;
-    padding:25px 30px;
-    border-radius:12px;
+    font-size: 22px;
+    font-weight: 700;
 }
 
-.rules-note strong{
-    display:block;
-    color:#0f7c85;
-    margin-bottom:10px;
-    font-size:1.2rem;
-}
-.house-rules h2{
-    text-align:center;
-    font-size:3rem;
-    color:#0f7c85;
-    margin-bottom:15px;
-}
-.house-rules .section-description{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 50px;
-    color:#666;
-    font-size:1.1rem;
-}
-/* ==========================================
-   APPLIANCE GUIDE
-========================================== */
-
-.appliance-guide{
-    padding:90px 20px;
-    background:#f7fafc;
-}
 
-.appliance-guide h2{
-    text-align:center;
-    font-size:3rem;
-    color:#0f7c85;
-    margin-bottom:15px;
-}
+.site-footer h4 {
+    margin: 0 0 15px;
 
-.appliance-guide .section-description{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 50px;
-    color:#666;
-    font-size:1.1rem;
-    line-height:1.8;
-}
+    color: #ffffff !important;
 
-.appliance-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:30px;
+    font-size: 16px;
+    font-weight: 700;
 }
-
-.appliance-card{
-    background:#fff;
-    padding:30px;
-    border-radius:18px;
-    border-top:4px solid #0f7c85;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
 
-    transition:.3s;
 
-    display:flex;
-    flex-direction:column;
+/* About text */
 
-    min-height:180px;
-}
-
-.appliance-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-}
+.footer-about p {
+    max-width: 330px;
 
-.appliance-card h3{
-    color:#0f7c85;
-    margin-bottom:15px;
-    font-size:1.4rem;
-}
+    margin: 0;
 
-.appliance-card p{
-    color:#555;
-    line-height:1.8;
-}
+    color: #E8F4FC;
 
-.appliance-note{
-    margin-top:50px;
-    background:#eef9f8;
-    border-left:5px solid #0f7c85;
-    padding:25px 30px;
-    border-radius:12px;
+    font-size: 13px;
+    line-height: 1.7;
 }
 
-.appliance-note strong{
-    display:block;
-    color:#0f7c85;
-    margin-bottom:10px;
-    font-size:1.2rem;
-}
-/* ==========================================
-   KITCHEN
-========================================== */
-
-.kitchen{
-    padding:90px 20px;
-    background:#ffffff;
-}
 
-.kitchen h2{
-    text-align:center;
-    font-size:3rem;
-    color:#0f7c85;
-    margin-bottom:15px;
-}
+/* Footer lists */
 
-.kitchen .section-description{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 50px;
-    color:#666;
-    font-size:1.1rem;
-    line-height:1.8;
-}
+.footer-column ul {
+    list-style: none;
 
-.kitchen-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:30px;
+    margin: 0;
+    padding: 0;
 }
 
-.kitchen-card{
-    background:#fff;
-    border-top:4px solid #0f7c85;
-    border-radius:18px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:0.3s;
-
-    display:flex;
-    flex-direction:column;
-
-    min-height:180px;
-}
 
-.kitchen-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
+.footer-column li {
+    margin-bottom: 9px;
 }
 
-.kitchen-card h3{
-    color:#0f7c85;
-    font-size:1.35rem;
-    margin-bottom:15px;
-}
 
-.kitchen-card p{
-    color:#555;
-    line-height:1.8;
-    flex:1;
-}
+.footer-column a {
+    color: #E8F4FC !important;
 
-.kitchen-note{
-    margin-top:50px;
-    background:#eef9f8;
-    border-left:5px solid #0f7c85;
-    border-radius:12px;
-    padding:25px 30px;
-}
+    text-decoration: none;
 
-.kitchen-note strong{
-    display:block;
-    color:#0f7c85;
-    font-size:1.2rem;
-    margin-bottom:10px;
-}
+    font-size: 13px;
 
-.kitchen-note p{
-    color:#555;
-    line-height:1.8;
+    transition:
+        color 0.2s ease,
+        padding-left 0.2s ease;
 }
-/* ==========================================
-   NEARBY PLACES
-========================================== */
-
-.nearby{
-    padding:90px 20px;
-    background:#f7fafc;
-}
 
-.nearby h2{
-    text-align:center;
-    font-size:3rem;
-    color:#0f7c85;
-    margin-bottom:15px;
-}
 
-.nearby .section-description{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 50px;
-    color:#666;
-    font-size:1.1rem;
-    line-height:1.8;
-}
+.footer-column a:hover {
+    color: #1E90FF !important;
 
-.nearby-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:30px;
+    padding-left: 4px;
 }
 
-.nearby-card{
-    background:#fff;
-    border-top:4px solid #0f7c85;
-    border-radius:18px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:.3s;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-
-    min-height:240px;
-}
 
-.nearby-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-}
+/* Contact */
 
-.nearby-card h3{
-    color:#0f7c85;
-    font-size:1.35rem;
-    margin-bottom:15px;
-}
+.footer-column p {
+    margin: 0 0 10px;
 
-.nearby-card p{
-    color:#555;
-    line-height:1.8;
-    margin-bottom:10px;
-}
+    color: #E8F4FC;
 
-.location-button{
-    display:inline-block;
-    margin-top:auto;
-    background:#0f7c85;
-    color:#fff;
-    padding:10px 18px;
-    border-radius:8px;
-    text-decoration:none;
-    font-weight:600;
-    transition:.3s;
-    text-align:center;
-}
+    font-size: 13px;
 
-.location-button:hover{
-    background:#0b6268;
+    line-height: 1.6;
 }
 
-.nearby-note{
-    margin-top:50px;
-    background:#eef9f8;
-    border-left:5px solid #0f7c85;
-    padding:25px 30px;
-    border-radius:12px;
-}
 
-.nearby-note strong{
-    display:block;
-    color:#0f7c85;
-    font-size:1.2rem;
-    margin-bottom:10px;
-}
+/* =========================================================
+   DISCLAIMER
+   ========================================================= */
 
-.nearby-note p{
-    color:#555;
-    line-height:1.8;
-}
-/* ==========================================
-   CHECKOUT
-========================================== */
-
-.checkout{
-    padding:90px 20px;
-    background:#ffffff;
-}
+.footer-disclaimer {
+    max-width: 1200px;
 
-.checkout h2{
-    text-align:center;
-    font-size:3rem;
-    color:#0f7c85;
-    margin-bottom:15px;
-}
+    margin: 0 auto;
 
-.checkout .section-description{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 50px;
-    color:#666;
-    font-size:1.1rem;
-    line-height:1.8;
-}
+    padding: 25px 30px;
 
-.checkout-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:30px;
+    border-top: 1px solid rgba(255,255,255,0.18);
 }
 
-.checkout-card{
-    background:#fff;
-    border-top:4px solid #0f7c85;
-    border-radius:18px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:.3s;
-
-    display:flex;
-    flex-direction:column;
-
-    min-height:170px;
-}
 
-.checkout-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-}
+.footer-disclaimer h4 {
+    margin-bottom: 10px;
 
-.checkout-card h3{
-    color:#0f7c85;
-    margin-bottom:15px;
-    font-size:1.35rem;
-}
+    color: #BFE3FA !important;
 
-.checkout-card p{
-    color:#555;
-    line-height:1.8;
-    flex:1;
+    font-size: 14px;
 }
 
-.checkout-note{
-    margin-top:50px;
-    background:#eef9f8;
-    border-left:5px solid #0f7c85;
-    border-radius:12px;
-    padding:25px 30px;
-}
 
-.checkout-note strong{
-    display:block;
-    color:#0f7c85;
-    font-size:1.25rem;
-    margin-bottom:12px;
-}
+.footer-disclaimer p {
+    margin: 0 0 9px;
 
-.checkout-note p{
-    color:#555;
-    line-height:1.8;
-}
-/* ==========================================
-   CONTACT
-========================================== */
-
-.contact{
-    padding:90px 20px;
-    background:#f7fafc;
-}
+    color: #D8EAF5;
 
-.contact h2{
-    text-align:center;
-    font-size:3rem;
-    color:#0f7c85;
-    margin-bottom:15px;
-}
+    font-size: 11px;
 
-.contact .section-description{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 50px;
-    color:#666;
-    font-size:1.1rem;
+    line-height: 1.6;
 }
 
-.contact-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:30px;
-    margin-bottom:50px;
-}
 
-.contact-card{
-    background:#fff;
-    padding:30px;
-    border-radius:18px;
-    border-top:4px solid #0f7c85;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
+/* =========================================================
+   FOOTER BOTTOM
+   ========================================================= */
 
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
+.footer-bottom {
+    display: flex;
 
-    min-height:210px;
+    justify-content: space-between;
 
-    transition:.3s;
-}
+    align-items: center;
 
-.contact-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-}
+    gap: 20px;
 
-.contact-card h3{
-    color:#0f7c85;
-    margin-bottom:20px;
-}
+    padding: 16px 30px;
 
-.contact-card p{
-    color:#555;
-    line-height:1.8;
-}
+    background: #0D304B;
 
-.contact-card a{
-    color:#0f7c85;
-    text-decoration:none;
-    font-weight:600;
+    border-top: 1px solid rgba(255,255,255,0.12);
 }
 
-.contact-button{
-    display:inline-block;
-    margin-top:20px;
-    padding:12px 22px;
-    background:#0f7c85;
-    color:white !important;
-    text-decoration:none;
-    border-radius:8px;
-    text-align:center;
-    transition:.3s;
-}
 
-.contact-button:hover{
-    background:#0b646b;
-}
+.footer-bottom p {
+    margin: 0;
 
-.map-container{
-    margin-top:40px;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,.12);
-}
+    color: #D8EAF5;
 
-.map-container iframe{
-    width:100%;
-    height:450px;
-    border:0;
+    font-size: 11px;
 }
 
-.contact-note{
-    margin-top:40px;
-    background:#eef9f8;
-    border-left:5px solid #0f7c85;
-    border-radius:12px;
-    padding:25px 30px;
-}
 
-.contact-note strong{
-    display:block;
-    color:#0f7c85;
-    font-size:1.2rem;
-    margin-bottom:10px;
-}
+/* =========================================================
+   TABLET
+   ========================================================= */
 
-.contact-note p{
-    color:#555;
-    line-height:1.8;
-}
-/* ===========================
-   Mobile Navigation
-=========================== */
+@media (max-width: 900px) {
 
-@media (max-width:768px){
+    .footer-container {
+        grid-template-columns: repeat(2, 1fr);
 
-    .navbar{
-        padding:12px 18px;
+        gap: 35px;
     }
 
-    .logo img{
-        height:42px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .site-footer {
+        margin-top: 50px;
     }
 
-    .logo span{
-        font-size:1.5rem;
+
+    .footer-container {
+        grid-template-columns: 1fr;
+
+        padding: 40px 20px 30px;
+
+        gap: 30px;
     }
 
-    .nav-links{
-        display:none;
+
+    .footer-about p {
+        max-width: none;
     }
 
-    .hero{
-        padding-top:90px;
-        min-height:auto;
+
+    .footer-disclaimer {
+        padding: 20px;
+    }
+
+
+    .footer-bottom {
+        flex-direction: column;
+
+        text-align: center;
+
+        padding: 18px 20px;
+
+        gap: 8px;
     }
 
 }

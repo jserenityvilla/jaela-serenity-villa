@@ -1,0 +1,747 @@
+/* =========================================
+   JA-ELA SERENITY VILLA - GALLERY
+   ========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f8f6ef;
+    color: #26382c;
+}
+
+section[id] {
+    scroll-margin-top: 25px;
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+.gallery-header {
+    width: 100%;
+    text-align: center;
+    padding: 45px 20px 35px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2ddcf;
+}
+
+.logo {
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #087F86;
+}
+
+.logo span {
+    display: block;
+    margin-top: 4px;
+    font-size: 32px;
+    font-weight: normal;
+    font-style: italic;
+    letter-spacing: 1px;
+    color: #075F65;
+}
+
+.gallery-header h1 {
+    margin: 20px 0 5px;
+    font-size: 32px;
+    color: #26382c;
+}
+
+.gallery-header p {
+    margin: 0;
+    font-size: 15px;
+    color: #6c756e;
+}
+
+
+/* =========================================
+   BACK TO MAIN SITE
+   ========================================= */
+
+.gallery-back {
+    max-width: 1200px;
+    margin: 0 auto 5px;
+    padding: 0 20px;
+    text-align: left;
+}
+
+.gallery-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 9px 16px;
+
+    color: #087F86;
+    background: #f8f6ef;
+
+    border: 1px solid #e2ddcf;
+    border-radius: 22px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.gallery-back a:hover {
+    color: #ffffff;
+    background: #087F86;
+    transform: translateX(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+.back-arrow {
+    font-size: 22px;
+    line-height: 1;
+}
+
+
+/* =========================================
+   MAIN CONTAINER
+   ========================================= */
+
+.gallery-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+
+/* =========================================
+   GALLERY SECTIONS
+   ========================================= */
+
+.gallery-section {
+    width: 100%;
+    padding: 40px 0;
+}
+
+.gallery-section h2 {
+    margin: 0 0 8px;
+    text-align: center;
+    font-size: 26px;
+    color: #087F86;
+}
+
+.section-description {
+    max-width: 650px;
+    margin: 0 auto 25px;
+    text-align: center;
+    font-size: 14px;
+    color: #6c756e;
+}
+
+
+/* =========================================
+   PHOTO GRID
+   ========================================= */
+
+.gallery-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+
+/* =========================================
+   PHOTO
+   ========================================= */
+
+.gallery-item {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 190px;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+.gallery-footer {
+    width: 100%;
+    margin-top: 30px;
+    padding: 35px 20px;
+    text-align: center;
+    background: #087F86;
+    color: #ffffff;
+}
+
+.gallery-footer h3 {
+    margin: 0 0 5px;
+}
+
+.gallery-footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 1000px) {
+    .gallery-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .gallery-item img {
+        height: 180px;
+    }
+}
+
+@media (max-width: 800px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+    }
+
+    .gallery-item img {
+        height: 175px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .gallery-header {
+        padding: 30px 15px 25px;
+    }
+
+    .logo span {
+        font-size: 28px;
+    }
+
+    .gallery-header h1 {
+        font-size: 28px;
+    }
+
+    .gallery-container {
+        padding: 10px 15px;
+    }
+
+    .gallery-back {
+        padding: 0 15px;
+        margin-bottom: 0;
+    }
+
+    .gallery-back a {
+        font-size: 13px;
+        padding: 8px 13px;
+    }
+
+    .gallery-section {
+        padding: 30px 0;
+    }
+
+    .gallery-section h2 {
+        font-size: 24px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .gallery-item {
+        border-radius: 10px;
+    }
+
+    .gallery-item img {
+        height: 135px;
+    }
+}
+
+
+/* =========================================
+   PHOTO LIGHTBOX
+   ========================================= */
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.92);
+
+    z-index: 9999;
+
+    padding: 30px;
+}
+
+.lightbox.active {
+    display: flex;
+}
+
+.lightbox-content {
+    position: relative;
+
+    max-width: 90vw;
+    max-height: 90vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#lightbox-image {
+    max-width: 90vw;
+    max-height: 82vh;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-caption {
+    margin-top: 12px;
+    color: #ffffff;
+    font-size: 15px;
+    text-align: center;
+}
+
+.lightbox-close {
+    position: fixed;
+
+    top: 20px;
+    right: 25px;
+
+    width: 45px;
+    height: 45px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.15);
+
+    color: #ffffff;
+
+    font-size: 32px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    z-index: 10001;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.lightbox-prev,
+.lightbox-next {
+    position: fixed;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 50px;
+    height: 60px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.15);
+
+    color: #ffffff;
+
+    font-size: 35px;
+
+    cursor: pointer;
+
+    z-index: 10001;
+}
+
+.lightbox-prev {
+    left: 20px;
+}
+
+.lightbox-next {
+    right: 20px;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+
+/* =========================================
+   LIGHTBOX MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .lightbox {
+        padding: 15px;
+    }
+
+    #lightbox-image {
+        max-width: 95vw;
+        max-height: 78vh;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+        width: 40px;
+        height: 50px;
+        font-size: 28px;
+    }
+
+    .lightbox-prev {
+        left: 8px;
+    }
+
+    .lightbox-next {
+        right: 8px;
+    }
+
+    .lightbox-close {
+        top: 10px;
+        right: 10px;
+
+        width: 40px;
+        height: 40px;
+
+        font-size: 28px;
+    }
+}
+
+
+/* =========================================
+   JA-ELA SERENITY VILLA - FINAL BLUE/TEAL GALLERY THEME
+   ========================================= */
+
+:root {
+    --villa-blue: #087F86;
+    --villa-blue-dark: #075F65;
+    --villa-blue-light: #3A9AA8;
+}
+
+/* Gallery headings */
+.gallery-header .logo,
+.gallery-header .logo span,
+.gallery-section h2 {
+    color: var(--villa-blue) !important;
+}
+
+/* Gallery photo tiles - white card with teal border */
+.gallery-item {
+    background: #ffffff !important;
+    border: 1px solid var(--villa-blue-light) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden;
+}
+
+.gallery-item:hover {
+    border-color: var(--villa-blue) !important;
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Back to Main Site */
+.gallery-back a {
+    background: var(--villa-blue) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--villa-blue) !important;
+}
+
+.gallery-back a:hover {
+    background: var(--villa-blue-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--villa-blue-dark) !important;
+}
+
+.gallery-back .back-arrow {
+    color: #ffffff !important;
+}
+
+/* Gallery footer */
+.gallery-footer {
+    background: var(--villa-blue) !important;
+}
+
+/* =========================================================
+   JA-ELA SERENITY VILLA — FINAL GALLERY BLUE THEME
+   Primary colour: #1E90FF
+   ========================================================= */
+
+:root {
+    --villa-blue: #1E90FF;
+    --villa-blue-dark: #1877CC;
+    --villa-blue-light: #D6EAFB;
+    --villa-blue-pale: #F4F8FF;
+    --villa-text: #333333;
+}
+
+/* ---------------------------------------------------------
+   HEADER / HEADINGS
+   --------------------------------------------------------- */
+
+.gallery-header {
+    background: #FFFFFF !important;
+    border-bottom: 1px solid var(--villa-blue-light) !important;
+}
+
+.gallery-header .logo,
+.gallery-header .logo span,
+.gallery-header h1,
+.gallery-section h2 {
+    color: var(--villa-blue) !important;
+}
+
+/* ---------------------------------------------------------
+   BACK TO MAIN SITE
+   --------------------------------------------------------- */
+
+.gallery-back a {
+    background: var(--villa-blue) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--villa-blue) !important;
+}
+
+.gallery-back a:hover {
+    background: var(--villa-blue-dark) !important;
+    border-color: var(--villa-blue-dark) !important;
+    color: #FFFFFF !important;
+}
+
+/* ---------------------------------------------------------
+   FULL GALLERY GRID
+   --------------------------------------------------------- */
+
+.gallery-grid {
+    width: 100%;
+    max-width: 1100px;
+    margin: 25px auto 0;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+}
+
+.gallery-item {
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+    background: #FFFFFF !important;
+    border: 1px solid #E1E8EF !important;
+    border-top: 3px solid var(--villa-blue-light) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(30,60,75,.09) !important;
+}
+
+.gallery-item img {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: cover !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transition: transform .3s ease;
+}
+
+.gallery-item:hover {
+    border-top-color: var(--villa-blue) !important;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.04);
+}
+
+/* ---------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------- */
+
+.gallery-footer {
+    background: var(--villa-blue-dark) !important;
+}
+
+/* ---------------------------------------------------------
+   LIGHTBOX
+   --------------------------------------------------------- */
+
+.lightbox {
+    background: rgba(0,0,0,.92) !important;
+}
+
+.lightbox-close,
+.lightbox-prev,
+.lightbox-next {
+    background: rgba(30,144,255,.80) !important;
+}
+
+.lightbox-close:hover,
+.lightbox-prev:hover,
+.lightbox-next:hover {
+    background: var(--villa-blue) !important;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE GALLERY
+   --------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+    .gallery-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .gallery-item {
+        height: 180px;
+    }
+}
+
+@media (max-width: 760px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+
+    .gallery-item {
+        height: 165px;
+    }
+}
+
+@media (max-width: 600px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .gallery-item {
+        height: 135px;
+    }
+}
+/* =========================================
+   STICKY BACK TO MAIN BUTTON
+   ========================================= */
+
+.gallery-back {
+    position: sticky !important;
+
+    top: 8px;
+
+    z-index: 9999;
+
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 10px 20px;
+
+    background: transparent;
+}
+
+
+/* Back button */
+
+.gallery-back a {
+    display: inline-flex !important;
+
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 16px;
+
+    background: #1E90FF !important;
+
+    color: #FFFFFF !important;
+
+    border: 1px solid #1E90FF !important;
+
+    border-radius: 22px;
+
+    text-decoration: none !important;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.15);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* Hover */
+
+.gallery-back a:hover {
+    background: #1877CC !important;
+
+    border-color: #1877CC !important;
+
+    color: #FFFFFF !important;
+
+    transform: translateX(-2px);
+
+    box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.20);
+}
+
+
+/* Arrow */
+
+.back-arrow {
+    font-size: 18px;
+
+    line-height: 1;
+}
