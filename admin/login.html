@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login | Ja-Ela Serenity Villa</title>
+
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <style>
+        .admin-login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: #f8fafc;
+        }
+
+        .admin-login-card {
+            width: 100%;
+            max-width: 440px;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+            border-top: 5px solid #0c7775;
+        }
+
+        .admin-login-logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .admin-login-logo img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .admin-login-title {
+            text-align: center;
+            color: #0c7775;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .admin-login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .admin-form-group {
+            margin-bottom: 20px;
+        }
+
+        .admin-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .admin-form-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 15px;
+            border: 1px solid #d7dce2;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .admin-form-group input:focus {
+            border-color: #0c7775;
+            box-shadow: 0 0 0 3px rgba(12,119,117,.10);
+        }
+
+        .admin-login-button {
+            width: 100%;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            background: #0c7775;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .admin-login-button:hover {
+            opacity: .92;
+        }
+
+        .admin-login-button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .admin-login-message {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .admin-login-message.error {
+            display: block;
+            background: #fff1f1;
+            border: 1px solid #f0c4c4;
+            color: #a33;
+        }
+
+        .admin-login-message.success {
+            display: block;
+            background: #eefaf7;
+            border: 1px solid #b9e4dc;
+            color: #176b61;
+        }
+
+        .admin-login-footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .admin-login-footer a {
+            color: #0c7775;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="admin-login-page">
+
+        <div class="admin-login-card">
+
+            <div class="admin-login-logo">
+                <img src="../assets/images/logo.png"
+                     alt="Ja-Ela Serenity Villa">
+            </div>
+
+            <h1 class="admin-login-title">
+                Admin Login
+            </h1>
+
+            <p class="admin-login-subtitle">
+                Ja-Ela Serenity Villa
+            </p>
+
+            <form id="adminLoginForm">
+
+                <div class="admin-form-group">
+                    <label for="adminEmail">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="adminEmail"
+                        autocomplete="username"
+                        required>
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="adminPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="adminPassword"
+                        autocomplete="current-password"
+                        required>
+                </div>
+
+                <button
+                    type="submit"
+                    id="adminLoginButton"
+                    class="admin-login-button">
+                    Sign In
+                </button>
+
+            </form>
+
+            <div
+                id="adminLoginMessage"
+                class="admin-login-message"
+                role="alert">
+            </div>
+
+            <div class="admin-login-footer">
+                <a href="../index.html">
+                    Return to Website
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+    <script src="../firebase/firebase-config.js"></script>
+    <script src="../assets/js/config.js"></script>
+
+    <script src="../assets/js/admin-login.js"></script>
+</body>
+</html>

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Expenses | Ja-Ela Serenity Villa</title>
+
+    <link
+        rel="stylesheet"
+        href="../../../assets/css/style.css">
+
+    <style>
+
+        .accounts-page {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+        }
+
+        .accounts-container {
+            width: 90%;
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .accounts-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .accounts-header h1 {
+            font-size: 3rem;
+            color: #0f7c85;
+            margin-bottom: 15px;
+        }
+
+        .accounts-header p {
+            max-width: 800px;
+            margin: auto;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .expense-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+            border-top: 4px solid #0f7c85;
+        }
+
+        .expense-card h2 {
+            color: #0f7c85;
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        .expense-card-description {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .expense-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .expense-toolbar label {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .expense-toolbar input,
+        .expense-toolbar select {
+            box-sizing: border-box;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .expense-search {
+            width: 230px;
+        }
+
+        .expense-toolbar select {
+            min-width: 165px;
+        }
+
+        .expense-toolbar input:focus,
+        .expense-toolbar select:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15, 124, 133, .1);
+        }
+
+        .expense-toolbar .date-input {
+            width: 150px;
+        }
+
+        .expense-button {
+            background: #0f7c85;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+            white-space: nowrap;
+        }
+
+        .expense-button:hover {
+            background: #0b6268;
+        }
+
+        .expense-button.secondary {
+            background: #eee;
+            color: #444;
+        }
+
+        .expense-button.secondary:hover {
+            background: #ddd;
+        }
+
+        .expense-button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .expense-summary {
+            margin: 10px 0 22px;
+            color: #0f7c85;
+            font-size: .95rem;
+            font-weight: 600;
+            line-height: 1.8;
+        }
+
+        .expense-result-count {
+            margin-bottom: 15px;
+            color: #666;
+            font-size: .95rem;
+        }
+
+        .expense-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1050px;
+        }
+
+        .expense-table th {
+            background: #0f7c85;
+            color: #fff;
+            padding: 14px 12px;
+            text-align: left;
+        }
+
+        .expense-table th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .expense-table th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .expense-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+            vertical-align: top;
+        }
+
+        .expense-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-active,
+        .status-cancelled {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: .85rem;
+            white-space: nowrap;
+        }
+
+        .status-active {
+            background: #eef9f8;
+            color: #0f7c85;
+        }
+
+        .status-cancelled {
+            background: #f1f1f1;
+            color: #666;
+        }
+
+        .expense-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.45);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .expense-modal.show {
+            display: flex;
+        }
+
+        .expense-modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,.2);
+            border-top: 4px solid #0f7c85;
+        }
+
+        .expense-modal-content h2 {
+            color: #0f7c85;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .expense-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            border: none;
+            background: transparent;
+            font-size: 30px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .expense-form-group {
+            margin-bottom: 20px;
+        }
+
+        .expense-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .expense-form-group input,
+        .expense-form-group select,
+        .expense-form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .expense-form-group input:focus,
+        .expense-form-group select:focus,
+        .expense-form-group textarea:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15,124,133,.1);
+        }
+
+        .expense-form-group textarea {
+            resize: vertical;
+        }
+
+        .expense-form-help {
+            color: #777;
+            font-size: .85rem;
+            margin-top: 5px;
+        }
+
+        .expense-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 900px) {
+
+            .expense-toolbar {
+                align-items: stretch;
+            }
+
+            .expense-toolbar label {
+                margin-top: 8px;
+            }
+
+            .expense-search,
+            .expense-toolbar select,
+            .expense-toolbar input.date-input {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .expense-card {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body data-admin-login-path="../../login.html">
+
+<header>
+
+    <nav class="navbar">
+
+        <a href="../../../index.html" class="logo">
+
+            <img
+                src="../../../assets/images/logo.png"
+                alt="Ja-Ela Serenity Villa">
+
+            <span>Ja-Ela Serenity Villa</span>
+
+        </a>
+
+        <div class="nav-links">
+
+            <a href="../../../index.html">🏠 Home</a>
+
+            <a href="../categories.html">📂 Categories</a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+<main class="accounts-page">
+
+    <div class="accounts-container">
+
+        <div class="accounts-header">
+
+            <h1>Property Expenses</h1>
+
+            <p>
+                Manage villa expenses, booking-specific costs
+                and property expenses used for profitability reporting.
+            </p>
+
+        </div>
+
+        <section class="expense-card">
+
+            <h2>Expenses</h2>
+
+            <p class="expense-card-description">
+                Record and manage expenses without deleting
+                financial history.
+            </p>
+
+            <div style="margin-bottom: 25px;">
+
+                <button
+                    type="button"
+                    id="addExpense"
+                    class="expense-button">
+                    + Add Expense
+                </button>
+
+            </div>
+
+            <div class="expense-toolbar">
+
+                <label for="expenseSearch">
+                    Search:
+                </label>
+
+                <input
+                    type="search"
+                    id="expenseSearch"
+                    class="expense-search"
+                    maxlength="100"
+                    placeholder="Search expenses">
+
+                <label for="expenseCategoryFilter">
+                    Category:
+                </label>
+
+                <select id="expenseCategoryFilter">
+
+                    <option value="all">
+                        All Categories
+                    </option>
+
+                </select>
+
+                <label for="expenseTypeFilter">
+                    Type:
+                </label>
+
+                <select id="expenseTypeFilter">
+
+                    <option value="all">
+                        All Types
+                    </option>
+
+                    <option value="Booking-specific">
+                        Booking-specific
+                    </option>
+
+                    <option value="Variable Property">
+                        Variable Property
+                    </option>
+
+                    <option value="Fixed Property">
+                        Fixed Property
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+                <label for="expenseStatusFilter">
+                    Status:
+                </label>
+
+                <select id="expenseStatusFilter">
+
+                    <option value="all">
+                        All Statuses
+                    </option>
+
+                    <option value="Active">
+                        Active
+                    </option>
+
+                    <option value="Cancelled">
+                        Cancelled
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="expense-toolbar">
+
+                <label for="expenseFromDate">
+                    From:
+                </label>
+
+                <input
+                    type="date"
+                    id="expenseFromDate"
+                    class="date-input">
+
+                <label for="expenseToDate">
+                    To:
+                </label>
+
+                <input
+                    type="date"
+                    id="expenseToDate"
+                    class="date-input">
+
+                <button
+                    type="button"
+                    id="clearExpenseFilters"
+                    class="expense-button secondary">
+                    Clear Filters
+                </button>
+
+                <label for="expenseSort">
+                    Sort:
+                </label>
+
+                <select id="expenseSort">
+
+                    <option value="dateDesc">
+                        Date Newest
+                    </option>
+
+                    <option value="dateAsc">
+                        Date Oldest
+                    </option>
+
+                    <option value="amountDesc">
+                        Amount Highest
+                    </option>
+
+                    <option value="amountAsc">
+                        Amount Lowest
+                    </option>
+
+                    <option value="supplierAsc">
+                        Supplier A–Z
+                    </option>
+
+                    <option value="supplierDesc">
+                        Supplier Z–A
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div
+                id="expenseSummary"
+                class="expense-summary">
+                Active Expenses: AUD 0.00
+            </div>
+
+            <div
+                id="expenseResultCount"
+                class="expense-result-count">
+                Showing 0 of 0 expenses
+            </div>
+
+            <div class="expense-table-wrapper">
+
+                <table class="expense-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Expense Type</th>
+                            <th>Amount</th>
+                            <th>Supplier</th>
+                            <th>Booking</th>
+                            <th>Status</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="expenseTableBody">
+
+                        <tr>
+
+                            <td colspan="8">
+                                Loading expenses...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<footer>
+
+    <p>© 2026 Ja-Ela Serenity Villa</p>
+
+</footer>
+
+<div
+    id="expenseModal"
+    class="expense-modal"
+    aria-hidden="true">
+
+    <div class="expense-modal-content">
+
+        <button
+            type="button"
+            id="closeExpenseModal"
+            class="expense-modal-close"
+            aria-label="Close">
+            &times;
+        </button>
+
+        <h2 id="expenseModalTitle">
+            Add Expense
+        </h2>
+
+        <form id="expenseForm">
+
+            <div class="expense-form-group">
+
+                <label for="expenseDate">
+                    Expense Date
+                </label>
+
+                <input
+                    type="date"
+                    id="expenseDate"
+                    required>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseCategory">
+                    Category
+                </label>
+
+                <select
+                    id="expenseCategory"
+                    required>
+
+                    <option value="">
+                        Select expense category
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseAmount">
+                    Amount
+                </label>
+
+                <input
+                    type="number"
+                    id="expenseAmount"
+                    min="0.01"
+                    max="1000000"
+                    step="0.01"
+                    required>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseCurrency">
+                    Currency
+                </label>
+
+                <select id="expenseCurrency">
+
+                    <option value="AUD">
+                        AUD
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseType">
+                    Expense Type
+                </label>
+
+                <select
+                    id="expenseType"
+                    required>
+
+                    <option value="Booking-specific">
+                        Booking-specific
+                    </option>
+
+                    <option value="Variable Property">
+                        Variable Property
+                    </option>
+
+                    <option value="Fixed Property">
+                        Fixed Property
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseBooking">
+                    Booking
+                </label>
+
+                <select id="expenseBooking">
+
+                    <option value="">
+                        Not linked to a booking
+                    </option>
+
+                </select>
+
+                <div
+                    id="expenseBookingHelp"
+                    class="expense-form-help">
+                    Required for Booking-specific expenses.
+                </div>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseAllocationMethod">
+                    Allocation Method
+                </label>
+
+                <select id="expenseAllocationMethod">
+
+                    <option value="None">
+                        None
+                    </option>
+
+                    <option value="Direct Booking">
+                        Direct Booking
+                    </option>
+
+                    <option value="Occupied Nights">
+                        Occupied Nights
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseDescription">
+                    Description
+                </label>
+
+                <textarea
+                    id="expenseDescription"
+                    maxlength="500"
+                    rows="4"
+                    placeholder="Describe the expense"></textarea>
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseSupplier">
+                    Supplier
+                </label>
+
+                <input
+                    type="text"
+                    id="expenseSupplier"
+                    maxlength="150">
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseReference">
+                    Reference
+                </label>
+
+                <input
+                    type="text"
+                    id="expenseReference"
+                    maxlength="150">
+
+            </div>
+
+            <div class="expense-form-group">
+
+                <label for="expenseStatus">
+                    Status
+                </label>
+
+                <select id="expenseStatus">
+
+                    <option value="Active">
+                        Active
+                    </option>
+
+                    <option value="Cancelled">
+                        Cancelled
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="expense-modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelExpense"
+                    class="expense-button secondary">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="expense-button">
+                    Save Expense
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="../../../firebase/firebase-config.js"></script>
+<script src="../../../assets/js/config.js"></script>
+<script src="../../../assets/js/admin-auth-guard.js"></script>
+<script src="accounts-expenses.js"></script>
+
+</body>
+
+</html>

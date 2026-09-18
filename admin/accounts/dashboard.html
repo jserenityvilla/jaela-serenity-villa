@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Accounts Dashboard | Ja-Ela Serenity Villa
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/style.css">
+
+    <style>
+
+        .accounts-page {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+        }
+
+        .accounts-container {
+            width: 90%;
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .accounts-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .accounts-header h1 {
+            font-size: 3rem;
+            color: #0f7c85;
+            margin-bottom: 15px;
+        }
+
+        .accounts-header p {
+            max-width: 800px;
+            margin: auto;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .dashboard-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+            border-top: 4px solid #0f7c85;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-card h2 {
+            color: #0f7c85;
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        .dashboard-card-description {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .period-toolbar {
+            display: flex;
+            align-items: end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .period-field {
+            min-width: 200px;
+            flex: 1;
+        }
+
+        .period-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .period-field select,
+        .period-field input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .period-field select:focus,
+        .period-field input:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15, 124, 133, .1);
+        }
+
+        .dashboard-button {
+            background: #0f7c85;
+            color: #fff;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .dashboard-button:hover {
+            background: #0b6268;
+        }
+
+        .period-summary {
+            margin-top: 18px;
+            color: #666;
+            font-size: .95rem;
+        }
+
+        .dashboard-error {
+            color: #b00020;
+            background: #fff5f5;
+            border: 1px solid #f0cccc;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .07);
+            border: 1px solid #eee;
+        }
+
+        .kpi-label {
+            color: #666;
+            font-size: .95rem;
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            color: #0f7c85;
+            font-size: 1.9rem;
+            font-weight: 700;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #555;
+        }
+
+        .metric-value {
+            color: #333;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .guest-analysis-note {
+            margin-top: 15px;
+            color: #777;
+            font-size: .9rem;
+        }
+
+        .dashboard-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .dashboard-table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+        }
+
+        .dashboard-table th {
+            background: #0f7c85;
+            color: #fff;
+            padding: 14px 12px;
+            text-align: left;
+        }
+
+        .dashboard-table th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .dashboard-table th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .dashboard-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .dashboard-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dashboard-table .empty-row {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+
+        @media (max-width: 900px) {
+
+            .accounts-header h1 {
+                font-size: 2.3rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .period-field {
+                width: 100%;
+            }
+
+            .dashboard-button {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+
+<body data-admin-login-path="../login.html">
+
+<header>
+
+    <nav class="navbar">
+
+        <a
+            href="../../index.html"
+            class="logo">
+
+            <img
+                src="../../assets/images/logo.png"
+                alt="Ja-Ela Serenity Villa">
+
+            <span>
+                Ja-Ela Serenity Villa
+            </span>
+
+        </a>
+
+        <div class="nav-links">
+
+            <a href="../../index.html">
+                🏠 Home
+            </a>
+
+            <a href="../../pages/booking.html">
+                📅 Booking
+            </a>
+
+            <a href="./categories.html">
+                📂 Categories
+            </a>
+
+            <a href="./expenses/expenses.html">
+                💰 Expenses
+            </a>
+
+            <a href="./utilities/utilities.html">
+                💡 Utilities
+            </a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+<main class="accounts-page">
+
+    <div class="accounts-container">
+
+        <div class="accounts-header">
+
+            <h1>
+                Accounts Dashboard
+            </h1>
+
+            <p>
+                Financial, occupancy and guest reservation
+                insights for Ja-Ela Serenity Villa.
+            </p>
+
+        </div>
+
+        <section class="dashboard-card">
+
+            <h2>
+                Reporting Period
+            </h2>
+
+            <p class="dashboard-card-description">
+                Select the period used for the Accounts analysis.
+            </p>
+
+            <div class="period-toolbar">
+
+                <div class="period-field">
+
+                    <label for="periodSelector">
+                        Period
+                    </label>
+
+                    <select id="periodSelector">
+
+                        <option value="month">
+                            This Month
+                        </option>
+
+                        <option value="quarter">
+                            This Quarter
+                        </option>
+
+                        <option value="year">
+                            This Year
+                        </option>
+
+                        <option value="custom">
+                            Custom Range
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div
+                    class="period-field"
+                    id="customFromField"
+                    hidden>
+
+                    <label for="customFrom">
+                        From
+                    </label>
+
+                    <input
+                        type="date"
+                        id="customFrom">
+
+                </div>
+
+                <div
+                    class="period-field"
+                    id="customToField"
+                    hidden>
+
+                    <label for="customTo">
+                        To
+                    </label>
+
+                    <input
+                        type="date"
+                        id="customTo">
+
+                </div>
+
+                <button
+                    type="button"
+                    id="refreshDashboard"
+                    class="dashboard-button">
+
+                    Refresh Dashboard
+
+                </button>
+
+            </div>
+
+            <div
+                id="periodSummary"
+                class="period-summary">
+
+                Dashboard data will appear here.
+
+            </div>
+
+            <div
+                id="dashboardError"
+                class="dashboard-error">
+            </div>
+
+        </section>
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-label">
+                    Total Revenue
+                </div>
+
+                <div
+                    class="kpi-value"
+                    id="kpiRevenue">
+
+                    $0.00
+
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <div class="kpi-label">
+                    Total Expenses
+                </div>
+
+                <div
+                    class="kpi-value"
+                    id="kpiExpenses">
+
+                    $0.00
+
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <div class="kpi-label">
+                    Net Profit
+                </div>
+
+                <div
+                    class="kpi-value"
+                    id="kpiProfit">
+
+                    $0.00
+
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <div class="kpi-label">
+                    Occupancy
+                </div>
+
+                <div
+                    class="kpi-value"
+                    id="kpiOccupancy">
+
+                    0.0%
+
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <div class="kpi-label">
+                    Booked Nights
+                </div>
+
+                <div
+                    class="kpi-value"
+                    id="kpiBookedNights">
+
+                    0
+
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <div class="kpi-label">
+                    Profit Margin
+                </div>
+
+                <div
+                    class="kpi-value"
+                    id="kpiMargin">
+
+                    0.0%
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <div class="analysis-grid">
+
+            <section class="dashboard-card">
+
+                <h2>
+                    Income Overview
+                </h2>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Accommodation Revenue
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="incomeAccommodation">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Extra Guest Revenue
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="incomeExtraGuest">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Cleaning Fee Revenue
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="incomeCleaning">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Other Income
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="incomeOther">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <strong>
+                        Total Income
+                    </strong>
+
+                    <strong
+                        class="metric-value"
+                        id="incomeTotal">
+
+                        $0.00
+
+                    </strong>
+
+                </div>
+
+            </section>
+
+            <section class="dashboard-card">
+
+                <h2>
+                    Expense Overview
+                </h2>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Booking-specific
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="expenseBookingSpecific">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Variable Property
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="expenseVariable">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Fixed Property
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="expenseFixed">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Other
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="expenseOther">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <span class="metric-label">
+                        Utilities
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="expenseUtilities">
+
+                        $0.00
+
+                    </span>
+
+                </div>
+
+                <div class="metric-row">
+
+                    <strong>
+                        Total Expenses
+                    </strong>
+
+                    <strong
+                        class="metric-value"
+                        id="expenseTotal">
+
+                        $0.00
+
+                    </strong>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <section class="dashboard-card">
+
+            <h2>
+                Occupancy & Profitability
+            </h2>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Available Nights
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="availableNights">
+
+                    0
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Booked Nights
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="analysisBookedNights">
+
+                    0
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Revenue / Night
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="revenuePerNight">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Expense / Night
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="expensePerNight">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Profit / Night
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="profitPerNight">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <strong>
+                    Profit Margin
+                </strong>
+
+                <strong
+                    class="metric-value"
+                    id="analysisProfitMargin">
+
+                    0.0%
+
+                </strong>
+
+            </div>
+
+        </section>
+
+        <section class="dashboard-card">
+
+            <h2>
+                Guest & Reservation Analysis
+            </h2>
+
+            <p class="dashboard-card-description">
+                Guest and reservation metrics to support
+                pricing and reservation-policy decisions.
+            </p>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Total Confirmed Bookings
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="totalBookings">
+
+                    0
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Total Guests
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="totalGuests">
+
+                    0
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Average Guests / Booking
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="averageGuestsPerBooking">
+
+                    0.0
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Guest-Nights
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="guestNights">
+
+                    0
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Revenue / Guest
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="revenuePerGuest">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Revenue / Guest-Night
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="revenuePerGuestNight">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Average Booking Value
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="averageBookingValue">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Average Stay
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="averageStay">
+
+                    0.0 nights
+
+                </span>
+
+            </div>
+
+            <p class="guest-analysis-note">
+                Historical bookings without stored guest counts
+                will be excluded from guest-specific metrics
+                rather than being estimated.
+            </p>
+
+        </section>
+
+        <section class="dashboard-card">
+
+            <h2>
+                Revenue by Guest Count
+            </h2>
+
+            <p class="dashboard-card-description">
+                Compare booking activity and revenue by guest
+                count to support pricing and reservation-policy
+                decisions.
+            </p>
+
+            <div class="dashboard-table-wrapper">
+
+                <table class="dashboard-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Guests
+                            </th>
+
+                            <th>
+                                Bookings
+                            </th>
+
+                            <th>
+                                Booked Nights
+                            </th>
+
+                            <th>
+                                Guest-Nights
+                            </th>
+
+                            <th>
+                                Revenue
+                            </th>
+
+                            <th>
+                                Revenue / Night
+                            </th>
+
+                            <th>
+                                Revenue / Guest-Night
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="revenueByGuestBody">
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty-row">
+
+                                No guest analysis available.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p class="guest-analysis-note">
+                Only confirmed bookings with stored guest counts
+                are included in this analysis.
+            </p>
+
+        </section>
+
+        <section class="dashboard-card">
+
+            <h2>
+                Payment Overview
+            </h2>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Deposits Received
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="paymentsDeposits">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Balances Received
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="paymentsBalances">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <span class="metric-label">
+                    Total Received
+                </span>
+
+                <span
+                    class="metric-value"
+                    id="paymentsReceived">
+
+                    $0.00
+
+                </span>
+
+            </div>
+
+            <div class="metric-row">
+
+                <strong>
+                    Outstanding Balance
+                </strong>
+
+                <strong
+                    class="metric-value"
+                    id="paymentsOutstanding">
+
+                    $0.00
+
+                </strong>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<footer>
+
+    <p>
+        &copy; 2026 Ja-Ela Serenity Villa
+    </p>
+
+</footer>
+
+<script
+    src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+</script>
+
+<script
+    src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
+</script>
+
+<script
+    src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js">
+</script>
+
+<script src="../../firebase/firebase-config.js"></script>
+
+<script src="../../assets/js/config.js"></script>
+
+<script src="../../assets/js/admin-auth-guard.js"></script>
+
+<script src="./accounts-dashboard.js"></script>
+
+</body>
+
+</html>

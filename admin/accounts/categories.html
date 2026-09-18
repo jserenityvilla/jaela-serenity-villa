@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Financial Categories | Ja-Ela Serenity Villa</title>
+
+    <link rel="stylesheet" href="../../assets/css/style.css">
+
+    <style>
+        .accounts-page {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+        }
+
+        .accounts-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .accounts-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .accounts-header h1 {
+            font-size: 3rem;
+            color: #0f7c85;
+            margin-bottom: 15px;
+        }
+
+        .accounts-header p {
+            max-width: 700px;
+            margin: auto;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .category-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+            border-top: 4px solid #0f7c85;
+        }
+
+        .category-card h2 {
+            color: #0f7c85;
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        .category-card-description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .category-table th {
+            background: #0f7c85;
+            color: #fff;
+            padding: 14px 16px;
+            text-align: left;
+        }
+
+        .category-table th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .category-table th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .category-table td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .category-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-active {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #eef9f8;
+            color: #0f7c85;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .status-inactive {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #f1f1f1;
+            color: #666;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .category-button {
+            background: #0f7c85;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .category-button:hover {
+            background: #0b6268;
+        }
+
+        .category-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .category-filter input[type="search"] {
+            width: 220px;
+            box-sizing: border-box;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .category-filter input[type="search"]:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15, 124, 133, .1);
+        }
+
+        .category-filter label {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .category-filter select {
+            min-width: 180px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .category-filter select:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15, 124, 133, .1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: #fff;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+
+            .accounts-page {
+                padding-top: 100px;
+            }
+
+            .accounts-header h1 {
+                font-size: 2.3rem;
+            }
+
+            .category-card {
+                padding: 20px;
+                overflow-x: auto;
+            }
+
+            .category-table {
+                min-width: 650px;
+            }
+        }
+
+        /* Category Modal */
+
+        .category-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .category-modal.show {
+            display: flex;
+        }
+
+        .category-modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            background: #fff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .2);
+            border-top: 4px solid #0f7c85;
+        }
+
+        .category-modal-content h2 {
+            color: #0f7c85;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .category-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            border: none;
+            background: transparent;
+            font-size: 30px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .category-form-group {
+            margin-bottom: 20px;
+        }
+
+        .category-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .category-form-group input,
+        .category-form-group select,
+        .category-form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .category-form-group input:focus,
+        .category-form-group select:focus,
+        .category-form-group textarea:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15, 124, 133, .1);
+        }
+
+        .category-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .category-button.secondary {
+            background: #eee;
+            color: #444;
+            white-space: nowrap;
+        }
+
+        .category-button.secondary:hover {
+            background: #ddd;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <nav class="navbar">
+
+        <a href="../../index.html" class="logo">
+
+            <img src="../../assets/images/logo.png"
+                 alt="Ja-Ela Serenity Villa">
+
+            <span>Ja-Ela Serenity Villa</span>
+
+        </a>
+
+        <div class="nav-links">
+
+            <a href="../../index.html">🏠 Home</a>
+
+            <a href="../../pages/booking.html">📅 Booking</a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+<main class="accounts-page">
+
+    <div class="accounts-container">
+
+        <div class="accounts-header">
+
+            <h1>Financial Categories</h1>
+
+            <p>
+                Manage the income, expense and utility categories
+                used throughout the Ja-Ela Serenity Villa accounts system.
+            </p>
+
+        </div>
+
+        <section class="category-card">
+
+            <h2>Categories</h2>
+
+            <p class="category-card-description">
+                Categories will be used to organise financial transactions
+                and generate accurate profitability and reporting.
+            </p>
+
+            <div style="margin-bottom: 25px;">
+                <button
+                    type="button"
+                    id="addCategory"
+                    class="category-button">
+                    + Add Category
+                </button>
+            </div>
+
+            <div class="category-filter">
+
+                <label for="categorySearch">
+                    Search:
+                </label>
+
+                <input
+                    type="search"
+                    id="categorySearch"
+                    maxlength="100"
+                    placeholder="Search categories">
+
+                <label for="categoryFilter">
+                    Filter:
+                </label>
+
+                <select id="categoryFilter">
+                    <option value="all">All Categories</option>
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Utility">Utility</option>
+                </select>
+
+                <label for="categoryStatusFilter">
+                    Status:
+                </label>
+
+                <select id="categoryStatusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+
+                <button
+                    type="button"
+                    id="clearCategoryFilters"
+                    class="category-button secondary">
+                    Clear Filters
+                </button>
+
+                <label for="categorySort">
+                    Sort:
+                </label>
+
+                <select id="categorySort">
+                    <option value="sortOrder">Sort Order</option>
+                    <option value="nameAsc">Name A–Z</option>
+                    <option value="nameDesc">Name Z–A</option>
+                </select>
+
+            </div>
+
+            <div
+                id="categorySummary"
+                style="margin: 0 0 10px; color: #0f7c85; font-size: .95rem; font-weight: 600;">
+                Income: 0 | Expense: 0 | Utility: 0
+            </div>
+
+            <div
+                id="categoryResultCount"
+                style="margin: 0 0 15px; color: #666; font-size: .95rem;">
+                Showing 0 of 0 categories
+            </div>
+
+            <table class="category-table">
+
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="categoryTableBody">
+
+                    <tr>
+                        <td>Accommodation</td>
+                        <td>Income</td>
+                        <td>
+                            <span class="status-active">
+                                Active
+                            </span>
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="category-button">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </div>
+
+</main>
+
+<footer>
+
+    <p>© 2026 Ja-Ela Serenity Villa</p>
+
+</footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+    <script src="../../firebase/firebase-config.js"></script>
+    <script src="../../assets/js/config.js"></script>
+    <script src="../../assets/js/admin-auth-guard.js"></script>
+    <script src="accounts-categories.js"></script>
+    <!-- Edit Category Modal -->
+    <div id="categoryModal" class="category-modal" aria-hidden="true">
+
+        <div class="category-modal-content">
+
+            <button
+                type="button"
+                id="closeCategoryModal"
+                class="category-modal-close"
+                aria-label="Close">
+                &times;
+            </button>
+
+            <h2 id="categoryModalTitle">Edit Category</h2>
+
+            <form id="categoryForm">
+
+                <div class="category-form-group">
+
+                    <label for="categoryName">
+                        Category Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="categoryName"
+                        maxlength="100"
+                        required>
+
+                </div>
+
+                <div class="category-form-group">
+
+                    <label for="categoryType">
+                        Category Type
+                    </label>
+
+                    <select id="categoryType" required>
+
+                        <option value="Income">
+                            Income
+                        </option>
+
+                        <option value="Expense">
+                            Expense
+                        </option>
+
+                        <option value="Utility">
+                            Utility
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="category-form-group">
+
+                    <label for="categoryDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="categoryDescription"
+                        maxlength="500"
+                        rows="3"
+                        placeholder="Enter a description for this category"></textarea>
+
+                </div>
+
+                <div class="category-form-group">
+
+                    <label for="categoryActive">
+                        Status
+                    </label>
+
+                    <select id="categoryActive">
+
+                        <option value="true">
+                            Active
+                        </option>
+
+                        <option value="false">
+                            Inactive
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="category-modal-actions">
+
+                    <button
+                        type="button"
+                        id="cancelCategory"
+                        class="category-button secondary">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="category-button">
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

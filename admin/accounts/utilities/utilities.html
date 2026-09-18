@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Utility Bills | Ja-Ela Serenity Villa</title>
+
+    <link rel="stylesheet" href="../../../assets/css/style.css">
+
+    <style>
+        .accounts-page {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+        }
+
+        .accounts-container {
+            width: 90%;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .accounts-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .accounts-header h1 {
+            font-size: 3rem;
+            color: #0f7c85;
+            margin-bottom: 15px;
+        }
+
+        .accounts-header p {
+            max-width: 800px;
+            margin: auto;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .utility-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+            border-top: 4px solid #0f7c85;
+        }
+
+        .utility-card h2 {
+            color: #0f7c85;
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        .utility-card-description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .utility-actions {
+            margin-bottom: 25px;
+        }
+
+        .utility-button {
+            background: #0f7c85;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .utility-button:hover {
+            background: #0b6268;
+        }
+
+        .utility-button.secondary {
+            background: #eee;
+            color: #444;
+            white-space: nowrap;
+        }
+
+        .utility-button.secondary:hover {
+            background: #ddd;
+        }
+
+        .utility-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .utility-filter label {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .utility-filter input,
+        .utility-filter select {
+            box-sizing: border-box;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .utility-filter input[type="search"] {
+            width: 220px;
+        }
+
+        .utility-filter input[type="date"] {
+            width: 165px;
+        }
+
+        .utility-filter select {
+            min-width: 180px;
+        }
+
+        .utility-filter input:focus,
+        .utility-filter select:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15, 124, 133, .1);
+        }
+
+        .utility-summary {
+            margin: 0 0 10px;
+            color: #0f7c85;
+            font-size: .95rem;
+            font-weight: 600;
+            line-height: 1.7;
+        }
+
+        .utility-result-count {
+            margin: 0 0 15px;
+            color: #666;
+            font-size: .95rem;
+        }
+
+        .utility-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .utility-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1150px;
+        }
+
+        .utility-table th {
+            background: #0f7c85;
+            color: #fff;
+            padding: 14px 16px;
+            text-align: left;
+        }
+
+        .utility-table th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .utility-table th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .utility-table td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .utility-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-active,
+        .status-cancelled {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: .9rem;
+        }
+
+        .status-active {
+            background: #eef9f8;
+            color: #0f7c85;
+        }
+
+        .status-cancelled {
+            background: #f1f1f1;
+            color: #666;
+        }
+
+        .utility-edit-button {
+            background: #0f7c85;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .utility-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .utility-modal.show {
+            display: flex;
+        }
+
+        .utility-modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 760px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .2);
+            border-top: 4px solid #0f7c85;
+        }
+
+        .utility-modal-content h2 {
+            color: #0f7c85;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .utility-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            border: none;
+            background: transparent;
+            font-size: 30px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .utility-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .utility-form-group {
+            margin-bottom: 5px;
+        }
+
+        .utility-form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .utility-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .utility-form-group input,
+        .utility-form-group select,
+        .utility-form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .utility-form-group input:focus,
+        .utility-form-group select:focus,
+        .utility-form-group textarea:focus {
+            outline: none;
+            border-color: #0f7c85;
+            box-shadow: 0 0 0 3px rgba(15, 124, 133, .1);
+        }
+
+        .utility-help-text {
+            color: #777;
+            font-size: .85rem;
+            margin-top: 6px;
+        }
+
+        .utility-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .accounts-page {
+                padding-top: 100px;
+            }
+
+            .accounts-header h1 {
+                font-size: 2.3rem;
+            }
+
+            .utility-card {
+                padding: 20px;
+            }
+
+            .utility-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .utility-form-group.full-width {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body data-admin-login-path="../../login.html">
+
+<header>
+    <nav class="navbar">
+        <a href="../../../index.html" class="logo">
+            <img src="../../../assets/images/logo.png"
+                 alt="Ja-Ela Serenity Villa">
+            <span>Ja-Ela Serenity Villa</span>
+        </a>
+
+        <div class="nav-links">
+            <a href="../../../index.html">🏠 Home</a>
+            <a href="../../../pages/booking.html">📅 Booking</a>
+            <a href="../categories.html">📂 Categories</a>
+            <a href="../expenses/expenses.html">💰 Expenses</a>
+        </div>
+    </nav>
+</header>
+
+<main class="accounts-page">
+    <div class="accounts-container">
+
+        <div class="accounts-header">
+            <h1>Utility Bills</h1>
+            <p>
+                Manage electricity, water, gas, internet, waste and other
+                property utility bills used throughout the Ja-Ela Serenity Villa
+                accounts system.
+            </p>
+        </div>
+
+        <section class="utility-card">
+
+            <h2>Utility Bills</h2>
+
+            <p class="utility-card-description">
+                Record utility bills, billing periods, usage and property
+                classification for accurate financial reporting.
+            </p>
+
+            <div class="utility-actions">
+                <button
+                    type="button"
+                    id="addUtilityBill"
+                    class="utility-button">
+                    + Add Utility Bill
+                </button>
+            </div>
+
+            <div class="utility-filter">
+
+                <label for="utilitySearch">Search:</label>
+
+                <input
+                    type="search"
+                    id="utilitySearch"
+                    maxlength="150"
+                    placeholder="Search bills">
+
+                <label for="utilityCategoryFilter">Utility:</label>
+
+                <select id="utilityCategoryFilter">
+                    <option value="all">All Utilities</option>
+                </select>
+
+                <label for="utilityClassificationFilter">Classification:</label>
+
+                <select id="utilityClassificationFilter">
+                    <option value="all">All Classifications</option>
+                    <option value="Fixed Property">Fixed Property</option>
+                    <option value="Variable Property">Variable Property</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label for="utilityStatusFilter">Status:</label>
+
+                <select id="utilityStatusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="true">Active</option>
+                    <option value="false">Cancelled</option>
+                </select>
+
+                <label for="utilityFromDate">From:</label>
+
+                <input
+                    type="date"
+                    id="utilityFromDate">
+
+                <label for="utilityToDate">To:</label>
+
+                <input
+                    type="date"
+                    id="utilityToDate">
+
+                <button
+                    type="button"
+                    id="clearUtilityFilters"
+                    class="utility-button secondary">
+                    Clear Filters
+                </button>
+
+                <label for="utilitySort">Sort:</label>
+
+                <select id="utilitySort">
+                    <option value="billDateDesc">Bill Date Newest</option>
+                    <option value="billDateAsc">Bill Date Oldest</option>
+                    <option value="amountDesc">Amount Highest</option>
+                    <option value="amountAsc">Amount Lowest</option>
+                    <option value="supplierAsc">Supplier A–Z</option>
+                    <option value="supplierDesc">Supplier Z–A</option>
+                </select>
+
+            </div>
+
+            <div id="utilitySummary" class="utility-summary">
+                Active Bills: AUD 0.00 | Fixed Property: AUD 0.00 |
+                Variable Property: AUD 0.00 | Other: AUD 0.00
+            </div>
+
+            <div id="utilityResultCount" class="utility-result-count">
+                Showing 0 of 0 utility bills
+            </div>
+
+            <div class="utility-table-wrapper">
+
+                <table class="utility-table">
+
+                    <thead>
+                        <tr>
+                            <th>Bill Date</th>
+                            <th>Utility</th>
+                            <th>Billing Period</th>
+                            <th>Amount</th>
+                            <th>Supplier</th>
+                            <th>Classification</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="utilityTableBody">
+                        <tr>
+                            <td colspan="8">
+                                Loading utility bills...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>© 2026 Ja-Ela Serenity Villa</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="../../../firebase/firebase-config.js"></script>
+<script src="../../../assets/js/config.js"></script>
+<script src="../../../assets/js/admin-auth-guard.js"></script>
+<script src="accounts-utilities.js"></script>
+
+<div id="utilityModal" class="utility-modal" aria-hidden="true">
+
+    <div class="utility-modal-content">
+
+        <button
+            type="button"
+            id="closeUtilityModal"
+            class="utility-modal-close"
+            aria-label="Close">
+            &times;
+        </button>
+
+        <h2 id="utilityModalTitle">Add Utility Bill</h2>
+
+        <form id="utilityForm">
+
+            <div class="utility-form-grid">
+
+                <div class="utility-form-group">
+                    <label for="utilityCategory">
+                        Utility Category
+                    </label>
+
+                    <select id="utilityCategory" required>
+                        <option value="">Select Utility</option>
+                    </select>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityBillDate">
+                        Bill Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="utilityBillDate"
+                        required>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityBillingPeriodFrom">
+                        Billing Period From
+                    </label>
+
+                    <input
+                        type="date"
+                        id="utilityBillingPeriodFrom"
+                        required>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityBillingPeriodTo">
+                        Billing Period To
+                    </label>
+
+                    <input
+                        type="date"
+                        id="utilityBillingPeriodTo"
+                        required>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityDueDate">
+                        Due Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="utilityDueDate"
+                        required>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityAmount">
+                        Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        id="utilityAmount"
+                        min="0.01"
+                        max="1000000"
+                        step="0.01"
+                        required>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityCurrency">
+                        Currency
+                    </label>
+
+                    <select id="utilityCurrency" required>
+                        <option value="AUD">AUD</option>
+                    </select>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityClassification">
+                        Classification
+                    </label>
+
+                    <select id="utilityClassification" required>
+                        <option value="Fixed Property">Fixed Property</option>
+                        <option value="Variable Property">
+                            Variable Property
+                        </option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityUsage">
+                        Usage
+                    </label>
+
+                    <input
+                        type="number"
+                        id="utilityUsage"
+                        min="0"
+                        step="0.001">
+
+                    <div class="utility-help-text">
+                        Optional meter or usage value.
+                    </div>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityUsageUnit">
+                        Usage Unit
+                    </label>
+
+                    <input
+                        type="text"
+                        id="utilityUsageUnit"
+                        maxlength="30"
+                        placeholder="e.g. kWh, m³, litres">
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityAllocationMethod">
+                        Allocation Method
+                    </label>
+
+                    <select id="utilityAllocationMethod" required>
+                        <option value="None">None</option>
+                        <option value="Occupied Nights">
+                            Occupied Nights
+                        </option>
+                        <option value="Direct Booking">
+                            Direct Booking
+                        </option>
+                    </select>
+
+                    <div id="utilityAllocationHelp" class="utility-help-text">
+                        Allocation can be configured for future
+                        profitability processing.
+                    </div>
+                </div>
+
+                <div class="utility-form-group" id="utilityBookingGroup">
+                    <label for="utilityBooking">
+                        Booking
+                    </label>
+
+                    <select id="utilityBooking">
+                        <option value="">Select Booking</option>
+                    </select>
+
+                    <div class="utility-help-text">
+                        Required when Direct Booking is selected.
+                    </div>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilitySupplier">
+                        Supplier
+                    </label>
+
+                    <input
+                        type="text"
+                        id="utilitySupplier"
+                        maxlength="150">
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityReference">
+                        Reference
+                    </label>
+
+                    <input
+                        type="text"
+                        id="utilityReference"
+                        maxlength="150">
+                </div>
+
+                <div class="utility-form-group full-width">
+                    <label for="utilityDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="utilityDescription"
+                        maxlength="500"
+                        rows="3"
+                        placeholder="Enter details about this utility bill"></textarea>
+                </div>
+
+                <div class="utility-form-group">
+                    <label for="utilityStatus">
+                        Status
+                    </label>
+
+                    <select id="utilityStatus" required>
+                        <option value="Active">Active</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="utility-modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelUtility"
+                    class="utility-button secondary">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="utility-button">
+                    Save Utility Bill
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
