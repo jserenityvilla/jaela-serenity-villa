@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounts - Bookings Financial View</title>
+
+    <link rel="stylesheet" href="../../assets/css/style-new.css">
+
+    <style>
+        :root {
+            --account-teal: #0f766e;
+            --account-teal-dark: #115e59;
+            --account-bg: #f4f7f7;
+            --account-card: #ffffff;
+            --account-border: #d8e2e2;
+            --account-text: #203030;
+            --account-muted: #667777;
+        }
+
+        body {
+            margin: 0;
+            background: var(--account-bg);
+            color: var(--account-text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .accounts-page {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .accounts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .accounts-header h1 {
+            margin: 0 0 6px;
+            font-size: 30px;
+        }
+
+        .accounts-header p {
+            margin: 0;
+            color: var(--account-muted);
+        }
+
+        .accounts-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .accounts-nav a {
+            display: inline-block;
+            padding: 9px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            background: #e8efef;
+            color: var(--account-text);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .accounts-nav a.active,
+        .accounts-nav a:hover {
+            background: var(--account-teal);
+            color: #fff;
+        }
+
+        .card {
+            background: var(--account-card);
+            border: 1px solid var(--account-border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(20, 50, 50, 0.05);
+        }
+
+        .card h2 {
+            margin: 0 0 16px;
+            font-size: 19px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(150px, 1fr));
+            gap: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 11px;
+            border: 1px solid #bccccc;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--account-text);
+        }
+
+        .filter-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--account-teal);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--account-teal-dark);
+        }
+
+        .btn-secondary {
+            background: #e8efef;
+            color: var(--account-text);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(140px, 1fr));
+            gap: 14px;
+        }
+
+        .summary-card {
+            border: 1px solid var(--account-border);
+            border-radius: 12px;
+            padding: 16px;
+            background: #fbfdfd;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--account-muted);
+            margin-bottom: 7px;
+        }
+
+        .summary-value {
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1250px;
+        }
+
+        th,
+        td {
+            padding: 11px 10px;
+            border-bottom: 1px solid #e1e8e8;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f5f8f8;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        td.numeric,
+        th.numeric {
+            text-align: right;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status-confirmed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .payment-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .payment-deposit {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .payment-due {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .payment-other {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--account-muted);
+        }
+
+        .loading {
+            padding: 20px;
+            text-align: center;
+            color: var(--account-muted);
+        }
+
+        .error {
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: #991b1b;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .detail-item {
+            border: 1px solid var(--account-border);
+            border-radius: 10px;
+            padding: 13px;
+            background: #fbfdfd;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--account-muted);
+            margin-bottom: 6px;
+        }
+
+        .detail-value {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .detail-section {
+            margin-top: 20px;
+        }
+
+        .detail-section h3 {
+            margin: 0 0 12px;
+            font-size: 16px;
+        }
+
+        .period-note {
+            margin-top: 10px;
+            color: var(--account-muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 1100px) {
+            .filters-grid {
+                grid-template-columns: repeat(2, minmax(180px, 1fr));
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(150px, 1fr));
+            }
+
+            .detail-grid {
+                grid-template-columns: repeat(2, minmax(160px, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .accounts-page {
+                padding: 14px;
+            }
+
+            .accounts-header {
+                flex-direction: column;
+            }
+
+            .filters-grid,
+            .summary-grid,
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body data-admin-login-path="../../login.html" style="visibility:hidden;">
+
+<div class="accounts-page">
+
+    <div class="accounts-header">
+        <div>
+            <h1>Bookings Financial View</h1>
+            <p>ACCT-002 · Financial view of existing booking records</p>
+        </div>
+    </div>
+
+    <nav class="accounts-nav">
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./bookings.html" class="active">Bookings</a>
+        <a href="./payments.html">Payments</a>
+        <a href="./categories.html">Categories</a>
+        <a href="./expenses/expenses.html">Expenses</a>
+        <a href="./utilities/utilities.html">Utility Bills</a>
+    </nav>
+
+    <div id="errorMessage" class="error"></div>
+
+    <section class="card">
+        <h2>Filters</h2>
+
+        <div class="filters-grid">
+
+            <div class="field">
+                <label for="dateFrom">Date From</label>
+                <input type="date" id="dateFrom">
+            </div>
+
+            <div class="field">
+                <label for="dateTo">Date To</label>
+                <input type="date" id="dateTo">
+            </div>
+
+            <div class="field">
+                <label for="bookingStatus">Booking Status</label>
+                <select id="bookingStatus">
+                    <option value="">All</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="paymentStatus">Payment Status</label>
+                <select id="paymentStatus">
+                    <option value="">All</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Deposit Paid">Deposit Paid</option>
+                    <option value="Deposit Required">Deposit Required</option>
+                    <option value="Balance Due">Balance Due</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="searchText">Guest / Reference</label>
+                <input type="text" id="searchText" placeholder="Search guest or reference">
+            </div>
+
+        </div>
+
+        <div class="filter-actions">
+            <button id="refreshBtn" class="btn-primary">Refresh</button>
+            <button id="clearBtn" class="btn-secondary">Clear Filters</button>
+        </div>
+
+        <div id="periodNote" class="period-note"></div>
+    </section>
+
+    <section class="card">
+        <h2>Financial Summary</h2>
+
+        <div class="summary-grid">
+
+            <div class="summary-card">
+                <div class="summary-label">Total Bookings</div>
+                <div class="summary-value" id="summaryTotalBookings">0</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Confirmed Bookings</div>
+                <div class="summary-value" id="summaryConfirmed">0</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Booking Revenue</div>
+                <div class="summary-value" id="summaryRevenue">$0.00</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Deposits Received</div>
+                <div class="summary-value" id="summaryDeposits">$0.00</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Balances Received</div>
+                <div class="summary-value" id="summaryBalances">$0.00</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Outstanding Balance</div>
+                <div class="summary-value" id="summaryOutstanding">$0.00</div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Bookings</h2>
+
+        <div id="loadingMessage" class="loading">Loading bookings...</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking Ref</th>
+                        <th>Guest</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th class="numeric">Guests</th>
+                        <th>Status</th>
+                        <th>Payment Status</th>
+                        <th class="numeric">Total</th>
+                        <th class="numeric">Deposit</th>
+                        <th class="numeric">Balance</th>
+                        <th class="numeric">Outstanding</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bookingTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="emptyMessage" class="empty-state" style="display:none;">
+            No bookings match the selected filters.
+        </div>
+    </section>
+
+    <section class="card" id="detailCard" style="display:none;">
+        <h2>Booking Financial Detail</h2>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Booking Reference</div>
+                <div class="detail-value" id="detailReference">-</div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Guest</div>
+                <div class="detail-value" id="detailGuest">-</div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Check-in</div>
+                <div class="detail-value" id="detailCheckin">-</div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Check-out</div>
+                <div class="detail-value" id="detailCheckout">-</div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Stay Details</h3>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Nights</div>
+                    <div class="detail-value" id="detailNights">0</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Adults</div>
+                    <div class="detail-value" id="detailAdults">0</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Children</div>
+                    <div class="detail-value" id="detailChildren">0</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Total Guests</div>
+                    <div class="detail-value" id="detailGuests">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Revenue Breakdown</h3>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Accommodation</div>
+                    <div class="detail-value" id="detailAccommodation">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Extra Guest Fee</div>
+                    <div class="detail-value" id="detailExtraGuest">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Cleaning Fee</div>
+                    <div class="detail-value" id="detailCleaning">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Booking Total</div>
+                    <div class="detail-value" id="detailTotal">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Payment Breakdown</h3>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Deposit Amount</div>
+                    <div class="detail-value" id="detailDeposit">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Deposit Paid</div>
+                    <div class="detail-value" id="detailDepositPaid">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Balance Amount</div>
+                    <div class="detail-value" id="detailBalance">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Balance Paid</div>
+                    <div class="detail-value" id="detailBalancePaid">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Outstanding Balance</div>
+                    <div class="detail-value" id="detailOutstanding">$0.00</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Payment Status</div>
+                    <div class="detail-value" id="detailPaymentStatus">-</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Booking Status</div>
+                    <div class="detail-value" id="detailBookingStatus">-</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="../../firebase/firebase-config.js"></script>
+<script src="../../assets/js/config.js"></script>
+<script src="../../assets/js/admin-auth-guard.js"></script>
+<script src="./accounts-bookings.js"></script>
+
+</body>
+</html>
