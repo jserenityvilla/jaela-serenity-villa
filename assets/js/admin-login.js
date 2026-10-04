@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return returnTarget;
         }
 
-        return "accounts/categories.html";
+        return "index.html";
     }
 
     loginForm.addEventListener("submit", async (event) => {
@@ -141,3 +141,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+

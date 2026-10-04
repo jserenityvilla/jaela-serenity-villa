@@ -1,0 +1,247 @@
+/*
+ * Ja-Ela Serenity Villa
+ * Shared Admin Portal Navigation
+ *
+ * This stylesheet belongs only to the shared
+ * Admin Portal navigation component.
+ */
+
+.admin-portal-navigation {
+    width: 100%;
+    background: #0f7c85;
+    color: #ffffff;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1000;
+}
+
+.admin-portal-nav-inner {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.admin-portal-nav-brand {
+    flex: 0 0 auto;
+}
+
+.admin-portal-nav-brand a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.2;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-portal-nav-brand span {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.admin-portal-nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.admin-nav-link {
+    box-sizing: border-box;
+    border: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+    padding: 8px 12px;
+
+    border-radius: 6px;
+
+    color: #ffffff;
+    background: transparent;
+
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link:focus-visible {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
+.admin-nav-link.active {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.admin-nav-website {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-nav-logout {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+@media (max-width: 900px) {
+
+    .admin-portal-nav-inner {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .admin-portal-nav-brand {
+        text-align: center;
+    }
+
+    .admin-portal-nav-brand a {
+        align-items: center;
+    }
+
+    .admin-portal-nav-links {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .admin-portal-nav-inner {
+        padding: 10px 12px;
+    }
+
+    .admin-portal-nav-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        width: 100%;
+    }
+
+    .admin-nav-link {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 6px;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .admin-nav-website,
+    .admin-nav-logout {
+        width: 100%;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .admin-portal-nav-links {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admin-portal-nav-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1 1 auto;
+}
+
+.admin-portal-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.admin-portal-nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+
+.admin-nav-action {
+    box-sizing: border-box;
+    min-height: 38px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #ffffff;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border: 0;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.admin-nav-action:hover,
+.admin-nav-action:focus-visible {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
+@media (max-width: 1100px) {
+    .admin-portal-nav-inner {
+        flex-wrap: wrap;
+    }
+
+    .admin-portal-nav-main {
+        order: 3;
+        width: 100%;
+    }
+
+    .admin-portal-nav-actions {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-portal-nav-main {
+        align-items: stretch;
+    }
+
+    .admin-portal-nav-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+    }
+
+    .admin-portal-nav-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+    }
+
+    .admin-nav-action {
+        width: 100%;
+        text-align: center;
+    }
+}
