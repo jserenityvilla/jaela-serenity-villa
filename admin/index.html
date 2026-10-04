@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Portal | Ja-Ela Serenity Villa</title>
+
+    <link rel="stylesheet" href="../assets/css/style-new.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+
+    <style>
+        .admin-portal {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 30px 50px;
+        }
+
+        .portal-header {
+            margin-bottom: 35px;
+        }
+
+        .portal-header h1 {
+            margin: 0 0 8px;
+            font-size: 34px;
+            color: #222;
+        }
+
+        .portal-header p {
+            margin: 0;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .portal-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 150px;
+            padding: 25px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+            text-decoration: none;
+            color: #222;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 30px rgba(0,0,0,.12);
+        }
+
+        .portal-card-icon {
+            font-size: 34px;
+            margin-bottom: 15px;
+        }
+
+        .portal-card h2 {
+            margin: 0 0 8px;
+            font-size: 21px;
+        }
+
+        .portal-card p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .portal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .portal-action {
+            padding: 11px 18px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .public-site {
+            background: #e8efef;
+            color: #203030;
+        }
+
+        .logout {
+            background: #c0392b;
+            color: #fff;
+            border: 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .portal-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .admin-portal {
+                margin: 30px auto;
+                padding: 0 15px 30px;
+            }
+
+            .portal-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .portal-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .portal-action {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body data-admin-login-path="login.html" style="visibility:hidden;">
+
+<header>
+    <h1>Ja-Ela Serenity Villa</h1>
+</header>
+
+<main class="admin-portal">
+
+    <section class="portal-header">
+        <h1>Admin Portal</h1>
+        <p>Select an area to manage Ja-Ela Serenity Villa.</p>
+    </section>
+
+    <section class="portal-grid">
+
+        <a class="portal-card" href="./accounts/bookings.html">
+            <div>
+                <div class="portal-card-icon">📅</div>
+                <h2>Bookings</h2>
+                <p>View and manage booking records and financial details.</p>
+            </div>
+        </a>
+
+        <a class="portal-card" href="./accounts/payments.html">
+            <div>
+                <div class="portal-card-icon">💳</div>
+                <h2>Payments</h2>
+                <p>Record and review booking payments.</p>
+            </div>
+        </a>
+
+        <a class="portal-card" href="./accounts/expenses/expenses.html">
+            <div>
+                <div class="portal-card-icon">💰</div>
+                <h2>Expenses</h2>
+                <p>Manage villa expenses and expense records.</p>
+            </div>
+        </a>
+
+        <a class="portal-card" href="./accounts/categories.html">
+            <div>
+                <div class="portal-card-icon">📂</div>
+                <h2>Categories</h2>
+                <p>Manage accounting categories.</p>
+            </div>
+        </a>
+
+        <a class="portal-card" href="./accounts/utilities/utilities.html">
+            <div>
+                <div class="portal-card-icon">💡</div>
+                <h2>Utilities</h2>
+                <p>Manage utility bills and related records.</p>
+            </div>
+        </a>
+
+        <a class="portal-card" href="./accounts/dashboard.html">
+            <div>
+                <div class="portal-card-icon">📊</div>
+                <h2>Accounts Dashboard</h2>
+                <p>View financial, occupancy and reservation insights.</p>
+            </div>
+        </a>
+
+    </section>
+
+    <section class="portal-actions">
+
+        <a
+            class="portal-action public-site"
+            href="https://jaelaserenityvilla.com"
+            target="_blank"
+            rel="noopener noreferrer">
+            🌐 View Public Website
+        </a>
+
+        <button
+            type="button"
+            class="portal-action logout"
+            onclick="adminSignOut()">
+            Logout
+        </button>
+
+    </section>
+
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="../firebase/firebase-config.js"></script>
+<script src="../assets/js/admin-auth-guard.js"></script>
+<script src="../assets/js/admin.js"></script>
+
+</body>
+</html>
+
