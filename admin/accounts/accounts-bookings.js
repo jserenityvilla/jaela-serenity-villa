@@ -29,34 +29,45 @@
     };
 
     const getPaymentStatus = (booking) => {
-        if (
-            booking.paymentStatus === "Paid" ||
+        const hasBalanceStatus =
+            booking.balancePaymentStatus !== undefined &&
+            booking.balancePaymentStatus !== null;
+
+        const hasBalanceFlag =
+            typeof booking.balancePaid === "boolean";
+
+        const hasSeparatePaymentFields =
+            (booking.depositPaymentStatus !== undefined &&
+                booking.depositPaymentStatus !== null) ||
+            hasBalanceStatus ||
+            typeof booking.depositPaid === "boolean" ||
+            hasBalanceFlag;
+
+        if (!hasSeparatePaymentFields) {
+            return booking.paymentStatus || "Pending";
+        }
+
+        const depositPaid =
+            booking.depositPaymentStatus === "Paid" ||
+            booking.depositPaid === true;
+
+        const balancePaid =
             booking.balancePaymentStatus === "Paid" ||
-            booking.balancePaid === true
-        ) {
+            booking.balancePaid === true;
+
+        if (depositPaid && balancePaid) {
             return "Paid";
         }
 
-        if (
-            booking.balancePaymentStatus === "Balance Due"
-        ) {
-            return "Balance Due";
-        }
-
-        if (
-            booking.paymentStatus === "Deposit Paid"
-        ) {
+        if (depositPaid) {
             return "Deposit Paid";
         }
 
-        if (
-            booking.paymentStatus === "Deposit Required" ||
-            booking.paymentStatus === "Deposit Checkout Created"
-        ) {
-            return "Deposit Required";
+        if (balancePaid) {
+            return "Balance Due";
         }
 
-        return booking.paymentStatus || "Pending";
+        return "Deposit Required";
     };
 
     const getDepositPaid = (booking) => {
@@ -99,6 +110,19 @@
     };
 
     const getOutstanding = (booking) => {
+        const currency = booking.currency || "AUD";
+
+        if (currency === "LKR") {
+            return getOutstandingLkr(booking);
+        }
+
+        const exchangeRate = number(booking.exchangeRateToLkr);
+
+        if (exchangeRate > 0) {
+            return getOutstandingLkr(booking) / exchangeRate;
+        }
+
+        // Legacy fallback when no LKR exchange rate was stored.
         const total = number(booking.total);
         const depositPaid = getDepositPaid(booking);
         const balancePaid = getBalancePaid(booking);
@@ -219,15 +243,19 @@
             return false;
         }
 
-        if (from && checkout) {
-            return checkout > from && checkin <= to;
+        if (from && checkout && checkout <= from) {
+            return false;
         }
 
-        if (from) {
-            return checkin >= from;
+        if (to && checkin > to) {
+            return false;
         }
 
-        return checkin <= to;
+        if (from && !checkout && checkin < from) {
+            return false;
+        }
+
+        return true;
     };
 
     const statusClass = (status) => {
@@ -413,27 +441,28 @@
                 )
                 .reduce(
                     (sum, booking) =>
-                        sum + number(booking.total),
+                        sum + getTotalLkr(booking),
                     0
                 );
+
         const deposits =
             bookings.reduce(
                 (sum, booking) =>
-                    sum + getDepositPaid(booking),
+                    sum + getDepositPaidLkr(booking),
                 0
             );
 
         const balances =
             bookings.reduce(
                 (sum, booking) =>
-                    sum + getBalancePaid(booking),
+                    sum + getBalancePaidLkr(booking),
                 0
             );
 
         const outstanding =
             bookings.reduce(
                 (sum, booking) =>
-                    sum + getOutstanding(booking),
+                    sum + getOutstandingLkr(booking),
                 0
             );
 
@@ -447,19 +476,19 @@
 
         document.getElementById(
             "summaryRevenue"
-        ).textContent = money(revenue);
+        ).textContent = money(revenue, "LKR");
 
         document.getElementById(
             "summaryDeposits"
-        ).textContent = money(deposits);
+        ).textContent = money(deposits, "LKR");
 
         document.getElementById(
             "summaryBalances"
-        ).textContent = money(balances);
+        ).textContent = money(balances, "LKR");
 
         document.getElementById(
             "summaryOutstanding"
-        ).textContent = money(outstanding);
+        ).textContent = money(outstanding, "LKR");
     };
 
     const showEditBooking = (booking) => {
