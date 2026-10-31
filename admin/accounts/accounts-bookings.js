@@ -1419,7 +1419,7 @@
         }
 
         const currency = currencyElement.value || "AUD";
-        const previousCurrency = currencyElement.dataset.previousCurrency || currency;
+        const previousCurrency = currencyElement.dataset.previousCurrency || "";
 
         if (currency === "LKR") {
             exchangeRateElement.value = "1";
@@ -1428,7 +1428,7 @@
                 exchangeRateLabel.textContent = "Exchange Rate (not required for LKR)";
             }
         } else {
-            if (previousCurrency === "LKR") {
+            if (previousCurrency && previousCurrency !== currency) {
                 exchangeRateElement.value = "";
             }
             exchangeRateElement.disabled = false;
