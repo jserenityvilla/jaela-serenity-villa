@@ -335,7 +335,7 @@
     <link rel="stylesheet" href="../../assets/css/admin-navigation.css">
 </head>
 
-<body data-admin-login-path="../../login.html" style="visibility:hidden;">
+<body data-admin-login-path="../login.html" style="visibility:hidden;">
 
 <div class="accounts-page">
 
@@ -347,13 +347,13 @@
     </div>
 
     <nav class="accounts-nav">
-        <a href="../index.html">Admin Portal</a>
-        <a href="./dashboard.html">Dashboard</a>
-        <a href="./bookings.html" class="active">Bookings</a>
-        <a href="./payments.html">Payments</a>
-        <a href="./categories.html">Categories</a>
-        <a href="./expenses/expenses.html">Expenses</a>
-        <a href="./utilities/utilities.html">Utility Bills</a>
+        <a href="/admin/index.html">Admin Portal</a>
+        <a href="/admin/accounts/dashboard.html">Dashboard</a>
+        <a href="/admin/accounts/bookings.html" class="active">Bookings</a>
+        <a href="/admin/accounts/payments.html">Payments</a>
+        <a href="/admin/accounts/categories.html">Categories</a>
+        <a href="/admin/accounts/expenses/expenses.html">Expenses</a>
+        <a href="/admin/accounts/utilities/utilities.html">Utility Bills</a>
     </nav>
 
     <div id="errorMessage" class="error"></div>
@@ -450,6 +450,288 @@
 
     <section class="card">
         <h2>Bookings</h2>
+
+<div class="filter-actions" style="margin-bottom:16px;">
+    <button id="addBookingBtn" class="btn-primary" type="button">+ Add Booking</button>
+</div>
+
+<div id="addBookingPanel" class="card" style="display:none;margin-top:16px;">
+    <h2>Add New Booking</h2>
+
+    <div class="detail-section">
+        <h3>Booking Details</h3>
+        <div class="filters-grid">
+            <div class="field">
+                <label for="addCheckin">Check-in *</label>
+                <input type="date" id="addCheckin" required>
+            </div>
+            <div class="field">
+                <label for="addCheckout">Check-out *</label>
+                <input type="date" id="addCheckout" required>
+            </div>
+            <div class="field">
+                <label for="addAdults">Adults *</label>
+                <input type="number" id="addAdults" min="1" value="1" required>
+            </div>
+            <div class="field">
+                <label for="addChildren">Children</label>
+                <input type="number" id="addChildren" min="0" value="0">
+            </div>
+            <div class="field">
+                <label for="addTotalGuests">Total Guests</label>
+                <input type="number" id="addTotalGuests" value="1" readonly>
+            </div>
+            <div class="field">
+                <label for="addBookingStatus">Booking Status</label>
+                <select id="addBookingStatus">
+                    <option value="Confirmed" selected>Confirmed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="addBookingCurrency">Booking Currency</label>
+                <select id="addBookingCurrency">
+                    <option value="AUD">AUD</option>
+                    <option value="LKR">LKR</option>
+                    <option value="USD">USD</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="addExchangeRateDate">Exchange Rate Date</label>
+                <input type="date" id="addExchangeRateDate">
+            </div>
+            <div class="field">
+                <label for="addExchangeRate">Exchange Rate (1 AUD = LKR)</label>
+                <input type="number" id="addExchangeRate" min="0" step="0.000001" value="0">
+            </div>
+            <div class="field">
+                <label for="addBookingSource">Booking Source</label>
+                <select id="addBookingSource">
+                    <option value="Direct Website">Direct Website</option>
+                    <option value="Airbnb">Airbnb</option>
+                    <option value="Booking.com">Booking.com</option>
+                    <option value="Manual">Manual</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Guest Information</h3>
+        <div class="filters-grid">
+            <div class="field">
+                <label for="addGuestName">Full Name *</label>
+                <input type="text" id="addGuestName" required>
+            </div>
+            <div class="field">
+                <label for="addEmail">Email</label>
+                <input type="email" id="addEmail">
+            </div>
+            <div class="field">
+                <label for="addPhone">Phone</label>
+                <input type="tel" id="addPhone">
+            </div>
+            <div class="field">
+                <label for="addCountry">Country</label>
+                <input type="text" id="addCountry">
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Arrival & Requests</h3>
+        <div class="filters-grid">
+            <div class="field">
+                <label for="addArrivalTime">Estimated Arrival Time</label>
+                <input type="time" id="addArrivalTime">
+            </div>
+            <div class="field" style="grid-column:span 2;">
+                <label for="addSpecialRequests">Special Requests</label>
+                <textarea id="addSpecialRequests" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Calculated Pricing</h3>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Nights</div>
+                <div class="detail-value" id="addNights">0</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Accommodation</div>
+                <input type="number" id="addAccommodation" class="detail-value" min="0" step="0.01" value="0">
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Extra Guest Fee</div>
+                <input type="number" id="addExtraGuestFee" class="detail-value" min="0" step="0.01" value="0">
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Cleaning Fee</div>
+                <input type="number" id="addCleaningFee" class="detail-value" min="0" step="0.01" value="0">
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Total</div>
+                <div class="detail-value" id="addTotal">AUD 0.00</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Total (LKR Reporting)</div>
+                <div class="detail-value" id="addTotalLkr">LKR 0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Payment</h3>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Deposit Amount</div>
+                <div class="detail-value" id="addDepositAmount">AUD 0.00</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Deposit (LKR Reporting)</div>
+                <div class="detail-value" id="addDepositAmountLkr">LKR 0.00</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Balance Amount</div>
+                <div class="detail-value" id="addBalanceAmount">AUD 0.00</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Balance (LKR Reporting)</div>
+                <div class="detail-value" id="addBalanceAmountLkr">LKR 0.00</div>
+            </div>
+            <div class="detail-section">
+                <h4>Deposit Payment</h4>
+
+                <div class="field">
+                    <label for="addDepositPaymentStatus">Deposit Payment Status</label>
+                    <select id="addDepositPaymentStatus">
+                        <option value="Not Paid" selected>Not Paid</option>
+                        <option value="Paid">Paid</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="addDepositPaymentCurrency">Payment Currency</label>
+                    <select id="addDepositPaymentCurrency">
+                        <option value="">Not received</option>
+                        <option value="LKR">LKR</option>
+                        <option value="AUD">AUD</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="addDepositPaymentAmount">Payment Amount</label>
+                    <input
+                        type="number"
+                        id="addDepositPaymentAmount"
+                        min="0"
+                        step="0.01"
+                        value=""
+                        placeholder="0.00"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="addDepositPaymentDate">Payment Received Date</label>
+                    <input type="date" id="addDepositPaymentDate">
+                </div>
+
+                <div class="field">
+                    <label for="addDepositPaymentExchangeRate">
+                        Exchange Rate to LKR
+                    </label>
+                    <input
+                        type="number"
+                        id="addDepositPaymentExchangeRate"
+                        min="0"
+                        step="0.0001"
+                        value=""
+                        placeholder="e.g. 225"
+                    >
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Deposit Payment (LKR)</div>
+                    <div class="detail-value" id="addDepositPaymentAmountLkr">
+                        LKR 0.00
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4>Balance Payment</h4>
+
+                <div class="field">
+                    <label for="addBalancePaymentStatus">Balance Payment Status</label>
+                    <select id="addBalancePaymentStatus">
+                        <option value="Not Paid" selected>Not Paid</option>
+                        <option value="Paid">Paid</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="addBalancePaymentCurrency">Payment Currency</label>
+                    <select id="addBalancePaymentCurrency">
+                        <option value="">Not received</option>
+                        <option value="LKR">LKR</option>
+                        <option value="AUD">AUD</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="addBalancePaymentAmount">Payment Amount</label>
+                    <input
+                        type="number"
+                        id="addBalancePaymentAmount"
+                        min="0"
+                        step="0.01"
+                        value=""
+                        placeholder="0.00"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="addBalancePaymentDate">Payment Received Date</label>
+                    <input type="date" id="addBalancePaymentDate">
+                </div>
+
+                <div class="field">
+                    <label for="addBalancePaymentExchangeRate">
+                        Exchange Rate to LKR
+                    </label>
+                    <input
+                        type="number"
+                        id="addBalancePaymentExchangeRate"
+                        min="0"
+                        step="0.0001"
+                        value=""
+                        placeholder="e.g. 225"
+                    >
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Balance Payment (LKR)</div>
+                    <div class="detail-value" id="addBalancePaymentAmountLkr">
+                        LKR 0.00
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addBookingError" class="error"></div>
+
+    <div class="filter-actions">
+        <button id="saveBookingBtn" class="btn-primary" type="button">Save Booking</button>
+        <button id="cancelAddBookingBtn" class="btn-secondary" type="button">Cancel</button>
+    </div>
+</div>
 
         <div id="loadingMessage" class="loading">Loading bookings...</div>
 
@@ -599,6 +881,196 @@
             </div>
         </div>
     </section>
+
+<section class="card" id="editBookingCard" style="display:none;">
+    <h2>Edit Booking</h2>
+
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="detail-label">Booking Reference</div>
+            <div class="detail-value" id="editBookingReference">-</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">Guest</div>
+            <div class="detail-value" id="editBookingGuest">-</div>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Booking Status</h3>
+
+        <div class="filters-grid">
+            <div class="field">
+                <label for="editBookingStatus">Booking Status</label>
+                <select id="editBookingStatus">
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Deposit Payment</h3>
+
+        <div class="filters-grid">
+            <div class="field">
+                <label for="editDepositPaymentStatus">
+                    Deposit Payment Status
+                </label>
+                <select id="editDepositPaymentStatus">
+                    <option value="Not Paid">Not Paid</option>
+                    <option value="Paid">Paid</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editDepositPaymentCurrency">
+                    Payment Currency
+                </label>
+                <select id="editDepositPaymentCurrency">
+                    <option value="">Not received</option>
+                    <option value="LKR">LKR</option>
+                    <option value="AUD">AUD</option>
+                    <option value="USD">USD</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editDepositPaymentAmount">
+                    Payment Amount
+                </label>
+                <input
+                    type="number"
+                    id="editDepositPaymentAmount"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                >
+            </div>
+
+            <div class="field">
+                <label for="editDepositPaymentDate">
+                    Payment Received Date
+                </label>
+                <input
+                    type="date"
+                    id="editDepositPaymentDate"
+                >
+            </div>
+
+            <div class="field">
+                <label for="editDepositPaymentExchangeRate">
+                    Exchange Rate to LKR
+                </label>
+                <input
+                    type="number"
+                    id="editDepositPaymentExchangeRate"
+                    min="0"
+                    step="0.0001"
+                    placeholder="e.g. 225"
+                >
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">
+                    Deposit Payment (LKR)
+                </div>
+                <div
+                    class="detail-value"
+                    id="editDepositPaymentAmountLkr"
+                >
+                    LKR 0.00
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Balance Payment</h3>
+
+        <div class="filters-grid">
+            <div class="field">
+                <label for="editBalancePaymentStatus">
+                    Balance Payment Status
+                </label>
+                <select id="editBalancePaymentStatus">
+                    <option value="Not Paid">Not Paid</option>
+                    <option value="Paid">Paid</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editBalancePaymentCurrency">
+                    Payment Currency
+                </label>
+                <select id="editBalancePaymentCurrency">
+                    <option value="">Not received</option>
+                    <option value="LKR">LKR</option>
+                    <option value="AUD">AUD</option>
+                    <option value="USD">USD</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editBalancePaymentAmount">
+                    Payment Amount
+                </label>
+                <input
+                    type="number"
+                    id="editBalancePaymentAmount"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                >
+            </div>
+
+            <div class="field">
+                <label for="editBalancePaymentDate">
+                    Payment Received Date
+                </label>
+                <input
+                    type="date"
+                    id="editBalancePaymentDate"
+                >
+            </div>
+
+            <div class="field">
+                <label for="editBalancePaymentExchangeRate">
+                    Exchange Rate to LKR
+                </label>
+                <input
+                    type="number"
+                    id="editBalancePaymentExchangeRate"
+                    min="0"
+                    step="0.0001"
+                    placeholder="e.g. 225"
+                >
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">
+                    Balance Payment (LKR)
+                </div>
+                <div
+                    class="detail-value"
+                    id="editBalancePaymentAmountLkr"
+                >
+                    LKR 0.00
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editBookingError" class="error-message" style="display:none;"></div>
+
+    <div class="portal-actions" style="margin-top:16px;">
+        <button type="button" class="btn-primary" id="saveEditBookingBtn">Save Changes</button>
+        <button type="button" class="btn-secondary" id="cancelEditBookingBtn">Cancel</button>
+    </div>
+</section>
 
 </div>
 
