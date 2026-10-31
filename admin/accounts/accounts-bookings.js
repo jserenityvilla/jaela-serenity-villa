@@ -492,6 +492,8 @@
     };
 
     const showEditBooking = (booking) => {
+        const bookingCurrency = booking.currency || "AUD";
+
         document.getElementById("editBookingReference").textContent =
             getBookingReference(booking, booking.id);
 
@@ -533,11 +535,14 @@
         document.getElementById("editDepositPaymentStatus").value =
             depositPaymentStatus;
 
-        document.getElementById("editDepositPaymentCurrency").value =
+        const depositPaymentCurrency =
             booking.depositPaymentCurrency ||
             (depositPaymentStatus === "Paid"
-                ? booking.paymentCurrency || booking.currency || ""
+                ? booking.paymentCurrency || bookingCurrency
                 : "");
+
+        document.getElementById("editDepositPaymentCurrency").value =
+            depositPaymentCurrency;
 
         document.getElementById("editDepositPaymentAmount").value =
             booking.depositPaymentAmount ??
@@ -558,19 +563,25 @@
             booking.depositPaymentExchangeRateToLkr ??
             (
                 depositPaymentStatus === "Paid" &&
-                !booking.depositPaymentStatus
+                !booking.depositPaymentStatus &&
+                depositPaymentCurrency === bookingCurrency
                     ? booking.exchangeRateToLkr ?? ""
-                    : ""
+                    : depositPaymentCurrency === "LKR"
+                        ? 1
+                        : ""
             );
 
         document.getElementById("editBalancePaymentStatus").value =
             balancePaymentStatus;
 
-        document.getElementById("editBalancePaymentCurrency").value =
+        const balancePaymentCurrency =
             booking.balancePaymentCurrency ||
             (balancePaymentStatus === "Paid"
-                ? booking.paymentCurrency || booking.currency || ""
+                ? booking.paymentCurrency || bookingCurrency
                 : "");
+
+        document.getElementById("editBalancePaymentCurrency").value =
+            balancePaymentCurrency;
 
         document.getElementById("editBalancePaymentAmount").value =
             booking.balancePaymentAmount ??
@@ -591,9 +602,12 @@
             booking.balancePaymentExchangeRateToLkr ??
             (
                 balancePaymentStatus === "Paid" &&
-                !booking.balancePaymentStatus
+                !booking.balancePaymentStatus &&
+                balancePaymentCurrency === bookingCurrency
                     ? booking.exchangeRateToLkr ?? ""
-                    : ""
+                    : balancePaymentCurrency === "LKR"
+                        ? 1
+                        : ""
             );
 
         [
@@ -1395,6 +1409,37 @@
         return currency + " " + value.toFixed(2);
     }
 
+    function updateBookingExchangeRateField() {
+        const currencyElement = document.getElementById("addBookingCurrency");
+        const exchangeRateElement = document.getElementById("addExchangeRate");
+        const exchangeRateLabel = document.getElementById("addExchangeRateLabel");
+
+        if (!currencyElement || !exchangeRateElement) {
+            return;
+        }
+
+        const currency = currencyElement.value || "AUD";
+        const previousCurrency = currencyElement.dataset.previousCurrency || currency;
+
+        if (currency === "LKR") {
+            exchangeRateElement.value = "1";
+            exchangeRateElement.disabled = true;
+            if (exchangeRateLabel) {
+                exchangeRateLabel.textContent = "Exchange Rate (not required for LKR)";
+            }
+        } else {
+            if (previousCurrency === "LKR") {
+                exchangeRateElement.value = "";
+            }
+            exchangeRateElement.disabled = false;
+            if (exchangeRateLabel) {
+                exchangeRateLabel.textContent = `Exchange Rate (1 ${currency} = LKR)`;
+            }
+        }
+
+        currencyElement.dataset.previousCurrency = currency;
+    }
+
     function calculateAdminBookingPricing() {
         const accommodation = parseFloat(document.getElementById("addAccommodation")?.value) || 0;
         const extraGuestFee = parseFloat(document.getElementById("addExtraGuestFee")?.value) || 0;
@@ -1432,14 +1477,21 @@
         }
     });
 
-    ["addBookingCurrency", "addExchangeRate"].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener("input", calculateAdminBookingPricing);
-            element.addEventListener("change", calculateAdminBookingPricing);
-        }
-    });
+    const addBookingCurrencyElement = document.getElementById("addBookingCurrency");
+    if (addBookingCurrencyElement) {
+        addBookingCurrencyElement.addEventListener("change", () => {
+            updateBookingExchangeRateField();
+            calculateAdminBookingPricing();
+        });
+    }
 
+    const addExchangeRateElement = document.getElementById("addExchangeRate");
+    if (addExchangeRateElement) {
+        addExchangeRateElement.addEventListener("input", calculateAdminBookingPricing);
+        addExchangeRateElement.addEventListener("change", calculateAdminBookingPricing);
+    }
+
+    updateBookingExchangeRateField();
     calculateAdminBookingPricing();
 
     // ============================================
@@ -2007,6 +2059,25 @@ updateAdminTotalGuests();
             const bookingCurrency = document.getElementById("addBookingCurrency")?.value || CONFIG.pricing.currency;
             const exchangeRate = bookingCurrency === "LKR" ? 1 : Number(document.getElementById("addExchangeRate")?.value) || 0;
             const exchangeRateDate = document.getElementById("addExchangeRateDate")?.value || "";
+
+            if (bookingCurrency !== "LKR" && exchangeRate <= 0) {
+                const errorElement = document.getElementById("addBookingError");
+                if (errorElement) {
+                    errorElement.textContent =
+                        `A valid ${bookingCurrency}-to-LKR exchange rate is required.`;
+                    errorElement.style.display = "block";
+                    errorElement.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+                }
+
+                isSavingAdminBooking = false;
+                saveBookingBtn.disabled = false;
+                saveBookingBtn.textContent = "Save Booking";
+                return;
+            }
+
             const totalLkr = bookingCurrency === "LKR" ? total : total * exchangeRate;
             const depositAmountLkr = bookingCurrency === "LKR" ? depositAmount : depositAmount * exchangeRate;
             const balanceAmountLkr = bookingCurrency === "LKR" ? balanceAmount : balanceAmount * exchangeRate;
