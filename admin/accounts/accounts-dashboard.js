@@ -706,8 +706,52 @@
             variableProperty: 0,
             fixedProperty: 0,
             other: 0,
-            utilities: 0
+            utilities: 0,
+            missingConversions: 0
         };
+
+        function parseFiniteNumber(value) {
+            if (typeof value === "number") {
+                return Number.isFinite(value) ? value : null;
+            }
+            if (typeof value !== "string") {
+                return null;
+            }
+
+            const trimmed = value.trim();
+            if (!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(trimmed)) {
+                return null;
+            }
+
+            const parsed = Number(trimmed);
+            return Number.isFinite(parsed) ? parsed : null;
+        }
+
+        function getAmountLkr(record) {
+            const amount = parseFiniteNumber(record.amount);
+            if (amount === null || amount < 0) {
+                return null;
+            }
+
+            const currency = String(record.currency || "AUD").toUpperCase();
+            if (currency === "LKR") {
+                return amount;
+            }
+            if (currency !== "AUD") {
+                return null;
+            }
+
+            const rate = parseFiniteNumber(record.exchangeRateToLkr);
+            if (rate === null || rate <= 0) {
+                return null;
+            }
+
+            const storedAmountLkr = parseFiniteNumber(record.amountLkr);
+            const amountLkr = storedAmountLkr !== null && storedAmountLkr >= 0
+                ? storedAmountLkr
+                : Number((amount * rate).toFixed(2));
+            return Number.isFinite(amountLkr) ? Number(amountLkr.toFixed(2)) : null;
+        }
 
         state.expenses.forEach(
             expense => {
@@ -736,10 +780,11 @@
                     return;
                 }
 
-                const amount =
-                    Number(
-                        expense.amount
-                    ) || 0;
+                const amount = getAmountLkr(expense);
+                if (amount === null) {
+                    result.missingConversions += 1;
+                    return;
+                }
 
                 const type =
                     String(
@@ -799,10 +844,12 @@
                     return;
                 }
 
-                result.utilities +=
-                    Number(
-                        bill.amount
-                    ) || 0;
+                const amount = getAmountLkr(bill);
+                if (amount === null) {
+                    result.missingConversions += 1;
+                    return;
+                }
+                result.utilities += amount;
             }
         );
 
@@ -1467,6 +1514,20 @@
             )
         );
 
+        let conversionWarning = document.getElementById("expenseConversionWarning");
+        if (!conversionWarning) {
+            conversionWarning = document.createElement("div");
+            conversionWarning.id = "expenseConversionWarning";
+            conversionWarning.setAttribute("role", "status");
+            const expenseKpi = document.getElementById("kpiExpenses");
+            if (expenseKpi?.parentElement) {
+                expenseKpi.parentElement.appendChild(conversionWarning);
+            }
+        }
+        conversionWarning.textContent = result.expenses.missingConversions > 0
+            ? `${result.expenses.missingConversions} active expense or utility record(s) excluded: missing a valid historical AUD-to-LKR conversion.`
+            : "";
+
         setText(
             "kpiProfit",
             money(
@@ -1574,7 +1635,6 @@
                 result.expenses.total
             )
         );
-
         setText(
             "availableNights",
             number(

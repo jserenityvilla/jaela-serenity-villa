@@ -33,6 +33,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const expenseCurrency =
         document.getElementById("expenseCurrency");
 
+    const expenseExchangeRateToLkr =
+        document.getElementById("expenseExchangeRateToLkr");
+
+    const expenseExchangeRateGroup =
+        document.getElementById("expenseExchangeRateGroup");
+
     const expenseType =
         document.getElementById("expenseType");
 
@@ -289,72 +295,26 @@ document.addEventListener("DOMContentLoaded", async () => {
                     expense.status === "Active"
             );
 
-        const total =
-            activeExpenses.reduce(
-                (sum, expense) =>
-                    sum + (Number(expense.amount) || 0),
-                0
+        const currencies = ["AUD", "LKR"];
+        const types = [
+            ["Active Expenses", null],
+            ["Booking-specific", "Booking-specific"],
+            ["Variable Property", "Variable Property"],
+            ["Fixed Property", "Fixed Property"],
+            ["Other", "Other"]
+        ];
+
+        expenseSummary.textContent = currencies.map(currency => {
+            const items = activeExpenses.filter(expense =>
+                String(expense.currency || "AUD").toUpperCase() === currency
             );
-
-        const bookingSpecific =
-            activeExpenses
-                .filter(
-                    expense =>
-                        expense.expenseType ===
-                        "Booking-specific"
-                )
-                .reduce(
-                    (sum, expense) =>
-                        sum + (Number(expense.amount) || 0),
-                    0
-                );
-
-        const variableProperty =
-            activeExpenses
-                .filter(
-                    expense =>
-                        expense.expenseType ===
-                        "Variable Property"
-                )
-                .reduce(
-                    (sum, expense) =>
-                        sum + (Number(expense.amount) || 0),
-                    0
-                );
-
-        const fixedProperty =
-            activeExpenses
-                .filter(
-                    expense =>
-                        expense.expenseType ===
-                        "Fixed Property"
-                )
-                .reduce(
-                    (sum, expense) =>
-                        sum + (Number(expense.amount) || 0),
-                    0
-                );
-
-        const other =
-            activeExpenses
-                .filter(
-                    expense =>
-                        expense.expenseType === "Other"
-                )
-                .reduce(
-                    (sum, expense) =>
-                        sum + (Number(expense.amount) || 0),
-                    0
-                );
-
-        expenseSummary.textContent =
-            [
-                `Active Expenses: ${formatAmount(total, "AUD")}`,
-                `Booking-specific: ${formatAmount(bookingSpecific, "AUD")}`,
-                `Variable Property: ${formatAmount(variableProperty, "AUD")}`,
-                `Fixed Property: ${formatAmount(fixedProperty, "AUD")}`,
-                `Other: ${formatAmount(other, "AUD")}`
-            ].join(" | ");
+            return `${currency}: ` + types.map(([label, type]) => {
+                const total = items
+                    .filter(expense => !type || expense.expenseType === type)
+                    .reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0);
+                return `${label} ${formatAmount(total, currency)}`;
+            }).join(" | ");
+        }).join(" || ");
 
     }
 
@@ -670,6 +630,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                             Number(data.amount) || 0,
                         currency:
                             data.currency || "AUD",
+                        exchangeRateToLkr:
+                            data.exchangeRateToLkr ?? null,
+                        amountLkr:
+                            data.amountLkr ?? null,
                         description:
                             data.description || "",
                         supplier:
@@ -720,6 +684,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         expenseCurrency.value =
             "AUD";
+        expenseExchangeRateToLkr.value = "";
+        updateExpenseCurrencyControls();
 
         expenseType.value =
             "Booking-specific";
@@ -774,6 +740,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         expenseCurrency.value =
             expense.currency || "AUD";
 
+        const savedExchangeRate = expense.exchangeRateToLkr;
+        const isValidRateString =
+            typeof savedExchangeRate === "string" &&
+            /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(
+                savedExchangeRate.trim()
+            );
+        const parsedExchangeRate =
+            typeof savedExchangeRate === "number"
+                ? savedExchangeRate
+                : isValidRateString
+                    ? Number(savedExchangeRate)
+                    : NaN;
+
+        expenseExchangeRateToLkr.value =
+            expense.currency === "LKR"
+                ? "1"
+                : Number.isFinite(parsedExchangeRate) && parsedExchangeRate > 0
+                    ? String(parsedExchangeRate)
+                    : "";
+        updateExpenseCurrencyControls();
+
         expenseType.value =
             expense.expenseType || "Other";
 
@@ -806,6 +793,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         expenseDate.focus();
 
+    }
+
+    function updateExpenseCurrencyControls() {
+        const isLkr = expenseCurrency.value === "LKR";
+        expenseExchangeRateGroup.hidden = isLkr;
+        expenseExchangeRateToLkr.required = !isLkr;
+        expenseExchangeRateToLkr.disabled = isLkr;
+        if (isLkr) {
+            expenseExchangeRateToLkr.value = "1";
+        } else if (expenseExchangeRateToLkr.value === "1") {
+            expenseExchangeRateToLkr.value = "";
+        }
     }
 
     function closeExpenseModalWindow() {
@@ -947,6 +946,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         }
 
+        if (expenseCurrency.value === "AUD") {
+            const rate = Number(expenseExchangeRateToLkr.value);
+            if (!Number.isFinite(rate) || rate <= 0) {
+                alert("Enter a valid AUD to LKR exchange rate greater than zero.");
+                expenseExchangeRateToLkr.focus();
+                return false;
+            }
+        }
+
         const validAllocationMethods = [
             "None",
             "Direct Booking",
@@ -1069,6 +1077,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     }
 
+    function calculateAmountLkr(amount, exchangeRateToLkr) {
+        const unroundedAmountLkr =
+            amount * exchangeRateToLkr;
+
+        if (
+            !Number.isFinite(unroundedAmountLkr) ||
+            unroundedAmountLkr <= 0
+        ) {
+            return null;
+        }
+
+        const amountLkr =
+            Number(
+                unroundedAmountLkr.toFixed(2)
+            );
+
+        return Number.isFinite(amountLkr) && amountLkr > 0
+            ? amountLkr
+            : null;
+    }
+
     function findPossibleDuplicate() {
 
         const date =
@@ -1169,6 +1198,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateBookingRequirement
     );
 
+    expenseCurrency.addEventListener("change", updateExpenseCurrencyControls);
+
     expenseForm.addEventListener(
         "submit",
         async event => {
@@ -1245,6 +1276,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                         ? "Direct Booking"
                         : expenseAllocationMethod.value;
 
+                const amount = Number(Number(expenseAmount.value).toFixed(2));
+                const exchangeRateToLkr = expenseCurrency.value === "LKR"
+                    ? 1
+                    : Number(expenseExchangeRateToLkr.value);
+                const amountLkr = calculateAmountLkr(
+                    amount,
+                    exchangeRateToLkr
+                );
+
+                if (amountLkr === null) {
+                    alert("The calculated LKR equivalent is invalid. Check the amount and exchange rate.");
+                    expenseExchangeRateToLkr.focus();
+                    return;
+                }
+
                 const data = {
 
                     expenseDate:
@@ -1253,14 +1299,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     categoryId:
                         expenseCategory.value,
 
-                    amount:
-                        Number(
-                            Number(expenseAmount.value)
-                                .toFixed(2)
-                        ),
+                    amount,
 
                     currency:
                         expenseCurrency.value,
+
+                    exchangeRateToLkr,
+
+                    amountLkr,
 
                     description:
                         description,
