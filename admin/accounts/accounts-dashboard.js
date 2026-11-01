@@ -32,6 +32,87 @@
         utilityBills: []
     };
 
+    function parseFiniteNumber(value) {
+        if (typeof value === "number") {
+            return Number.isFinite(value) ? value : null;
+        }
+
+        if (typeof value !== "string") {
+            return null;
+        }
+
+        const trimmed = value.trim();
+        if (!/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(trimmed)) {
+            return null;
+        }
+
+        const parsed = Number(trimmed);
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function addFiniteNumbers(total, amount) {
+        const safeTotal = parseFiniteNumber(total) ?? 0;
+        const safeAmount = parseFiniteNumber(amount) ?? 0;
+        const result = safeTotal + safeAmount;
+
+        return Number.isFinite(result) ? result : safeTotal;
+    }
+
+    function multiplyFiniteNumbers(left, right) {
+        const safeLeft = parseFiniteNumber(left);
+        const safeRight = parseFiniteNumber(right);
+
+        if (safeLeft === null || safeRight === null) {
+            return null;
+        }
+
+        const result = safeLeft * safeRight;
+        return Number.isFinite(result) ? result : null;
+    }
+
+    function divideFiniteNumbers(numerator, denominator) {
+        const safeNumerator = parseFiniteNumber(numerator);
+        const safeDenominator = parseFiniteNumber(denominator);
+
+        if (safeNumerator === null || safeDenominator === null || safeDenominator === 0) {
+            return 0;
+        }
+
+        const result = safeNumerator / safeDenominator;
+        return Number.isFinite(result) ? result : 0;
+    }
+
+    function getValidExchangeRate(currency, value) {
+        if (String(currency || "AUD").toUpperCase() === "LKR") {
+            return 1;
+        }
+
+        const rate = parseFiniteNumber(value);
+        return rate !== null && rate > 0 ? rate : null;
+    }
+
+    function getLkrEquivalent(amount, currency, exchangeRate, storedAmountLkr) {
+        const stored = parseFiniteNumber(storedAmountLkr);
+        if (stored !== null) {
+            return stored;
+        }
+
+        const parsedAmount = parseFiniteNumber(amount);
+        if (parsedAmount === null) {
+            return null;
+        }
+
+        const normalizedCurrency = String(currency || "AUD").toUpperCase();
+        if (normalizedCurrency === "LKR") {
+            return parsedAmount;
+        }
+
+        const rate = getValidExchangeRate(normalizedCurrency, exchangeRate);
+        return rate === null
+            ? null
+            : multiplyFiniteNumbers(parsedAmount, rate);
+    }
+
     function money(value) {
         return new Intl.NumberFormat(
             "en-LK",
@@ -455,18 +536,12 @@
         }
 
         const adults =
-            Number(
-                booking.adults
-            ) || 0;
+            parseFiniteNumber(booking.adults) ?? 0;
 
         const children =
-            Number(
-                booking.children
-            ) || 0;
+            parseFiniteNumber(booking.children) ?? 0;
 
-        const total =
-            adults +
-            children;
+        const total = addFiniteNumbers(adults, children);
 
         return total > 0
             ? total
@@ -509,43 +584,89 @@
                 booking.currency || "AUD"
             ).toUpperCase();
 
-        const exchangeRate =
-            currency === "LKR"
-                ? 1
-                : Number(
-                    booking.exchangeRateToLkr
-                ) || 0;
+        const amountFields = [
+            "accommodation",
+            "extraGuestFee",
+            "cleaningFee"
+        ];
+        const originalAmounts = amountFields.map(
+            field => {
+                const amount = parseFiniteNumber(booking[field]);
+                return amount !== null && amount >= 0 ? amount : 0;
+            }
+        );
+        const componentStoredLkr = amountFields.map(
+            field => {
+                const amount = parseFiniteNumber(booking[field]);
+                const amountLkr = parseFiniteNumber(booking[`${field}Lkr`]);
 
-        const accommodation =
-            (
-                Number(
-                    booking.accommodation
-                ) || 0
-            ) * exchangeRate;
+                return (
+                    amount !== null &&
+                    amount >= 0 &&
+                    amountLkr !== null &&
+                    amountLkr >= 0
+                )
+                    ? amountLkr
+                    : null;
+            }
+        );
 
-        const extraGuestFee =
-            (
-                Number(
-                    booking.extraGuestFee
-                ) || 0
-            ) * exchangeRate;
+        let [accommodation, extraGuestFee, cleaningFeeAmount] = originalAmounts;
+
+        if (currency !== "LKR") {
+            const storedTotalLkr = parseFiniteNumber(booking.totalLkr);
+            const originalTotal = originalAmounts.reduce(
+                (total, amount) => total + amount,
+                0
+            );
+            const storedTotalMatchesSign =
+                storedTotalLkr !== null &&
+                Number.isFinite(originalTotal) &&
+                (
+                    storedTotalLkr === 0
+                        ? originalTotal === 0
+                        : Math.sign(storedTotalLkr) === Math.sign(originalTotal)
+                );
+            const allComponentEquivalentsStored =
+                componentStoredLkr.every(amount => amount !== null);
+
+            if (allComponentEquivalentsStored) {
+                [accommodation, extraGuestFee, cleaningFeeAmount] = componentStoredLkr;
+            } else if (storedTotalMatchesSign && originalTotal !== 0) {
+                [accommodation, extraGuestFee, cleaningFeeAmount] = originalAmounts.map(
+                    amount =>
+                        multiplyFiniteNumbers(
+                            storedTotalLkr,
+                            amount / originalTotal
+                        ) ?? 0
+                );
+            } else {
+                [accommodation, extraGuestFee, cleaningFeeAmount] = originalAmounts.map(
+                    (amount, index) =>
+                        getLkrEquivalent(
+                            amount,
+                            currency,
+                            booking.exchangeRateToLkr,
+                            componentStoredLkr[index]
+                        ) ?? 0
+                );
+            }
+        }
 
         const accommodationShare =
             bookingNights > 0
-                ? accommodation *
-                    (
-                        overlapNights /
-                        bookingNights
-                    )
+                ? multiplyFiniteNumbers(
+                    accommodation,
+                    overlapNights / bookingNights
+                ) ?? 0
                 : 0;
 
         const extraGuestShare =
             bookingNights > 0
-                ? extraGuestFee *
-                    (
-                        overlapNights /
-                        bookingNights
-                    )
+                ? multiplyFiniteNumbers(
+                    extraGuestFee,
+                    overlapNights / bookingNights
+                ) ?? 0
                 : 0;
 
         let cleaningFee = 0;
@@ -560,12 +681,7 @@
             checkout >= period.from &&
             checkout <= period.to
         ) {
-            cleaningFee =
-                (
-                    Number(
-                        booking.cleaningFee
-                    ) || 0
-                ) * exchangeRate;
+            cleaningFee = parseFiniteNumber(cleaningFeeAmount) ?? 0;
         }
 
         return {
@@ -577,10 +693,10 @@
 
             cleaningFee,
 
-            total:
-                accommodationShare +
-                extraGuestShare +
+            total: addFiniteNumbers(
+                addFiniteNumbers(accommodationShare, extraGuestShare),
                 cleaningFee
+            )
         };
     }
 
@@ -634,11 +750,15 @@
                         checkout
                     );
 
-                bookedNights +=
-                    overlapNights;
+                bookedNights = addFiniteNumbers(
+                    bookedNights,
+                    overlapNights
+                );
 
-                totalStayNights +=
-                    bookingNights;
+                totalStayNights = addFiniteNumbers(
+                    totalStayNights,
+                    bookingNights
+                );
 
                 const revenue =
                     getPeriodRevenue(
@@ -648,14 +768,20 @@
                         bookingNights
                     );
 
-                accommodation +=
-                    revenue.accommodation;
+                accommodation = addFiniteNumbers(
+                    accommodation,
+                    revenue.accommodation
+                );
 
-                extraGuestFee +=
-                    revenue.extraGuestFee;
+                extraGuestFee = addFiniteNumbers(
+                    extraGuestFee,
+                    revenue.extraGuestFee
+                );
 
-                cleaningFee +=
-                    revenue.cleaningFee;
+                cleaningFee = addFiniteNumbers(
+                    cleaningFee,
+                    revenue.cleaningFee
+                );
 
                 const guests =
                     getGuestCount(
@@ -668,21 +794,25 @@
                     guestDataBookings +=
                         1;
 
-                    totalGuests +=
-                        guests;
+                    totalGuests = addFiniteNumbers(
+                        totalGuests,
+                        guests
+                    );
 
-                    guestNights +=
-                        guests *
-                        overlapNights;
+                    guestNights = addFiniteNumbers(
+                        guestNights,
+                        multiplyFiniteNumbers(guests, overlapNights) ?? 0
+                    );
                 }
             }
         );
 
-        const total =
-            accommodation +
-            extraGuestFee +
-            cleaningFee +
-            otherIncome;
+        const total = [
+            accommodation,
+            extraGuestFee,
+            cleaningFee,
+            otherIncome
+        ].reduce(addFiniteNumbers, 0);
 
         return {
             accommodation,
@@ -796,23 +926,31 @@
                     type ===
                     "booking-specific"
                 ) {
-                    result.bookingSpecific +=
-                        amount;
+                    result.bookingSpecific = addFiniteNumbers(
+                        result.bookingSpecific,
+                        amount
+                    );
                 } else if (
                     type ===
                     "variable property"
                 ) {
-                    result.variableProperty +=
-                        amount;
+                    result.variableProperty = addFiniteNumbers(
+                        result.variableProperty,
+                        amount
+                    );
                 } else if (
                     type ===
                     "fixed property"
                 ) {
-                    result.fixedProperty +=
-                        amount;
+                    result.fixedProperty = addFiniteNumbers(
+                        result.fixedProperty,
+                        amount
+                    );
                 } else {
-                    result.other +=
-                        amount;
+                    result.other = addFiniteNumbers(
+                        result.other,
+                        amount
+                    );
                 }
             }
         );
@@ -849,16 +987,20 @@
                     result.missingConversions += 1;
                     return;
                 }
-                result.utilities += amount;
+                result.utilities = addFiniteNumbers(
+                    result.utilities,
+                    amount
+                );
             }
         );
 
-        result.total =
-            result.bookingSpecific +
-            result.variableProperty +
-            result.fixedProperty +
-            result.other +
-            result.utilities;
+        result.total = [
+            result.bookingSpecific,
+            result.variableProperty,
+            result.fixedProperty,
+            result.other,
+            result.utilities
+        ].reduce(addFiniteNumbers, 0);
 
         return result;
     }
@@ -872,113 +1014,175 @@
         let balancesReceived = 0;
         let outstanding = 0;
 
+        const getPaymentAmountLkr = (
+            booking,
+            paymentType,
+            legacyAmountField,
+            legacyAmountLkrField
+        ) => {
+            const paymentPrefix = `${paymentType}Payment`;
+            const rawPaymentAmount = booking[`${paymentPrefix}Amount`];
+            const hasPaymentAmount =
+                rawPaymentAmount !== undefined &&
+                rawPaymentAmount !== null;
+            const paymentAmount = parseFiniteNumber(rawPaymentAmount);
+            const storedPaymentLkr = parseFiniteNumber(
+                booking[`${paymentPrefix}AmountLkr`]
+            );
+            const hasValidStoredPaymentLkr =
+                storedPaymentLkr !== null &&
+                storedPaymentLkr > 0;
+
+            if (hasPaymentAmount) {
+                if (paymentAmount === null || paymentAmount <= 0) {
+                    return 0;
+                }
+                if (hasValidStoredPaymentLkr) {
+                    return storedPaymentLkr;
+                }
+
+                const paymentCurrency = String(
+                    booking[`${paymentPrefix}Currency`] ||
+                    booking.currency ||
+                    "AUD"
+                ).toUpperCase();
+                const paymentRate =
+                    getValidExchangeRate(
+                        paymentCurrency,
+                        booking[`${paymentPrefix}ExchangeRateToLkr`]
+                    ) ??
+                    getValidExchangeRate(
+                        paymentCurrency,
+                        booking.exchangeRateToLkr
+                    );
+                const paymentEquivalent = getLkrEquivalent(
+                    paymentAmount,
+                    paymentCurrency,
+                    paymentRate,
+                    null
+                );
+
+                if (paymentEquivalent !== null) {
+                    return paymentEquivalent;
+                }
+            }
+
+            const rawLegacyAmount = booking[legacyAmountField];
+            const hasLegacyAmount =
+                rawLegacyAmount !== undefined &&
+                rawLegacyAmount !== null;
+            const legacyAmount = parseFiniteNumber(rawLegacyAmount);
+            const legacyStoredLkr = parseFiniteNumber(
+                booking[legacyAmountLkrField]
+            );
+            const hasValidLegacyStoredLkr =
+                legacyStoredLkr !== null &&
+                legacyStoredLkr > 0;
+
+            if (hasLegacyAmount) {
+                if (legacyAmount === null || legacyAmount <= 0) {
+                    return 0;
+                }
+                if (hasValidLegacyStoredLkr) {
+                    return legacyStoredLkr;
+                }
+
+                return getLkrEquivalent(
+                    legacyAmount,
+                    booking.currency || "AUD",
+                    booking.exchangeRateToLkr,
+                    null
+                ) ?? 0;
+            }
+
+            if (hasValidStoredPaymentLkr) {
+                return storedPaymentLkr;
+            }
+
+            return hasValidLegacyStoredLkr
+                ? legacyStoredLkr
+                : 0;
+        };
+
+        const getBookingTotalLkr = booking => {
+            const storedTotalLkr = parseFiniteNumber(booking.totalLkr);
+            if (storedTotalLkr !== null && storedTotalLkr > 0) {
+                return storedTotalLkr;
+            }
+
+            const originalTotal = parseFiniteNumber(booking.total);
+            if (originalTotal === null || originalTotal <= 0) {
+                return 0;
+            }
+
+            return getLkrEquivalent(
+                originalTotal,
+                booking.currency || "AUD",
+                booking.exchangeRateToLkr,
+                null
+            ) ?? 0;
+        };
+
+        const hasPaymentStatus = (booking, type) =>
+            booking[`${type}PaymentStatus`] !== undefined &&
+            booking[`${type}PaymentStatus`] !== null;
+
+        const isDepositPaid = booking => {
+            const hasStatus = hasPaymentStatus(booking, "deposit");
+            const legacyStatus = String(booking.paymentStatus || "");
+
+            return hasStatus
+                ? booking.depositPaymentStatus === "Paid"
+                : (
+                    booking.depositPaid === true ||
+                    legacyStatus === "Deposit Paid" ||
+                    legacyStatus === "Balance Due" ||
+                    legacyStatus === "Paid"
+                );
+        };
+
+        const isBalancePaid = booking => {
+            const hasStatus = hasPaymentStatus(booking, "balance");
+            const legacyStatus = String(booking.paymentStatus || "");
+
+            return hasStatus
+                ? booking.balancePaymentStatus === "Paid"
+                : (
+                    booking.balancePaid === true ||
+                    legacyStatus === "Paid"
+                );
+        };
+
+        const bookingOutstandingLkr = booking => {
+            const totalLkr = getBookingTotalLkr(booking);
+            const depositLkr = isDepositPaid(booking)
+                ? getPaymentAmountLkr(
+                    booking,
+                    "deposit",
+                    "depositAmount",
+                    "depositAmountLkr"
+                )
+                : 0;
+            const balanceLkr = isBalancePaid(booking)
+                ? getPaymentAmountLkr(
+                    booking,
+                    "balance",
+                    "balanceAmount",
+                    "balanceAmountLkr"
+                )
+                : 0;
+            const remaining = totalLkr - depositLkr - balanceLkr;
+
+            return Number.isFinite(remaining)
+                ? Math.max(0, remaining)
+                : 0;
+        };
+
         bookings.forEach(
             booking => {
-                const currency =
-                    String(
-                        booking.currency || "AUD"
-                    ).toUpperCase();
-
-                const exchangeRate =
-                    currency === "LKR"
-                        ? 1
-                        : Number(
-                            booking.exchangeRateToLkr
-                        ) || 0;
-
-                const depositAmount =
-                    Number(
-                        booking.depositAmount
-                    ) || 0;
-
-                const balanceAmount =
-                    Number(
-                        booking.balanceAmount
-                    ) || 0;
-
-                const depositAmountLkr =
-                    booking.depositAmountLkr !== undefined
-                        ? Number(
-                            booking.depositAmountLkr
-                        ) || 0
-                        : depositAmount * exchangeRate;
-
-                const balanceAmountLkr =
-                    booking.balanceAmountLkr !== undefined
-                        ? Number(
-                            booking.balanceAmountLkr
-                        ) || 0
-                        : balanceAmount * exchangeRate;
-
-                const hasDepositPaymentStatus =
-                    booking.depositPaymentStatus !== undefined &&
-                    booking.depositPaymentStatus !== null;
-
-                const hasBalancePaymentStatus =
-                    booking.balancePaymentStatus !== undefined &&
-                    booking.balancePaymentStatus !== null;
-
-                const legacyPaymentStatus =
-                    String(booking.paymentStatus || "");
-
-                const depositPaid =
-                    hasDepositPaymentStatus
-                        ? booking.depositPaymentStatus === "Paid"
-                        : (
-                            booking.depositPaid === true ||
-                            legacyPaymentStatus === "Deposit Paid" ||
-                            legacyPaymentStatus === "Balance Due" ||
-                            legacyPaymentStatus === "Paid"
-                        );
-
-                const balancePaid =
-                    hasBalancePaymentStatus
-                        ? booking.balancePaymentStatus === "Paid"
-                        : (
-                            booking.balancePaid === true ||
-                            legacyPaymentStatus === "Paid"
-                        );
-
-                const actualDepositLkr =
-                    depositPaid
-                        ? (
-                            booking.depositPaymentAmountLkr !== undefined
-                                ? Number(
-                                    booking.depositPaymentAmountLkr
-                                ) || 0
-                                : depositAmountLkr
-                        )
-                        : 0;
-
-                const actualBalanceLkr =
-                    balancePaid
-                        ? (
-                            booking.balancePaymentAmountLkr !== undefined
-                                ? Number(
-                                    booking.balancePaymentAmountLkr
-                                ) || 0
-                                : balanceAmountLkr
-                        )
-                        : 0;
-
-
-
-                const totalLkr =
-                    booking.totalLkr !== undefined
-                        ? Number(
-                            booking.totalLkr
-                        ) || 0
-                        : (
-                            Number(
-                                booking.total
-                            ) || 0
-                        ) * exchangeRate;
-
-                outstanding += Math.max(
-                    0,
-                    totalLkr -
-                    actualDepositLkr -
-                    actualBalanceLkr
+                outstanding = addFiniteNumbers(
+                    outstanding,
+                    bookingOutstandingLkr(booking)
                 );
             }
         );
@@ -999,129 +1203,54 @@
 
         (Array.isArray(receiptBookings) ? receiptBookings : [])
             .forEach(booking => {
-                const currency =
-                    String(booking.currency || "AUD").toUpperCase();
-
-                const exchangeRate =
-                    currency === "LKR"
-                        ? 1
-                        : Number(booking.exchangeRateToLkr) || 0;
-
-                const depositAmount =
-                    Number(booking.depositAmount) || 0;
-
-                const balanceAmount =
-                    Number(booking.balanceAmount) || 0;
-
-                const depositAmountLkr =
-                    booking.depositAmountLkr !== undefined
-                        ? Number(booking.depositAmountLkr) || 0
-                        : depositAmount * exchangeRate;
-
-                const balanceAmountLkr =
-                    booking.balanceAmountLkr !== undefined
-                        ? Number(booking.balanceAmountLkr) || 0
-                        : balanceAmount * exchangeRate;
-
-                const hasDepositPaymentStatus =
-                    booking.depositPaymentStatus !== undefined &&
-                    booking.depositPaymentStatus !== null;
-
-                const hasBalancePaymentStatus =
-                    booking.balancePaymentStatus !== undefined &&
-                    booking.balancePaymentStatus !== null;
-
-                const legacyPaymentStatus =
-                    String(booking.paymentStatus || "");
-
-                const depositPaid =
-                    hasDepositPaymentStatus
-                        ? booking.depositPaymentStatus === "Paid"
-                        : (
-                            booking.depositPaid === true ||
-                            legacyPaymentStatus === "Deposit Paid" ||
-                            legacyPaymentStatus === "Balance Due" ||
-                            legacyPaymentStatus === "Paid"
-                        );
-
-                const balancePaid =
-                    hasBalancePaymentStatus
-                        ? booking.balancePaymentStatus === "Paid"
-                        : (
-                            booking.balancePaid === true ||
-                            legacyPaymentStatus === "Paid"
-                        );
-
-                const depositDate =
-                    hasDepositPaymentStatus
-                        ? booking.depositPaymentDate
-                        : booking.paymentReceivedDate;
-
-                const balanceDate =
-                    hasBalancePaymentStatus
-                        ? booking.balancePaymentDate
-                        : booking.paymentReceivedDate;
-
-                const depositReceivedLkr =
-                    depositPaid
-                        ? (
-                            booking.depositPaymentAmountLkr !== undefined
-                                ? Number(booking.depositPaymentAmountLkr) || 0
-                                : hasDepositPaymentStatus
-                                    ? (
-                                        String(booking.depositPaymentCurrency || "").toUpperCase() === "LKR"
-                                            ? Number(booking.depositPaymentAmount) || 0
-                                            : (Number(booking.depositPaymentAmount) || 0) *
-                                                (
-                                                    Number(booking.depositPaymentExchangeRateToLkr) ||
-                                                    Number(booking.exchangeRateToLkr) ||
-                                                    0
-                                                )
-                                    )
-                                    : depositAmountLkr
-                        )
-                        : 0;
-
-                const balanceReceivedLkr =
-                    balancePaid
-                        ? (
-                            booking.balancePaymentAmountLkr !== undefined
-                                ? Number(booking.balancePaymentAmountLkr) || 0
-                                : hasBalancePaymentStatus
-                                    ? (
-                                        String(booking.balancePaymentCurrency || "").toUpperCase() === "LKR"
-                                            ? Number(booking.balancePaymentAmount) || 0
-                                            : (Number(booking.balancePaymentAmount) || 0) *
-                                                (
-                                                    Number(booking.balancePaymentExchangeRateToLkr) ||
-                                                    Number(booking.exchangeRateToLkr) ||
-                                                    0
-                                                )
-                                    )
-                                    : balanceAmountLkr
-                        )
-                        : 0;
+                const depositPaid = isDepositPaid(booking);
+                const balancePaid = isBalancePaid(booking);
+                const hasDepositStatus = hasPaymentStatus(booking, "deposit");
+                const hasBalanceStatus = hasPaymentStatus(booking, "balance");
+                const depositDate = hasDepositStatus
+                    ? booking.depositPaymentDate
+                    : booking.paymentReceivedDate;
+                const balanceDate = hasBalanceStatus
+                    ? booking.balancePaymentDate
+                    : booking.paymentReceivedDate;
 
                 if (
                     depositPaid &&
                     paymentDateIsInPeriod(depositDate)
                 ) {
-                    depositsReceived += depositReceivedLkr;
+                    depositsReceived = addFiniteNumbers(
+                        depositsReceived,
+                        getPaymentAmountLkr(
+                            booking,
+                            "deposit",
+                            "depositAmount",
+                            "depositAmountLkr"
+                        )
+                    );
                 }
 
                 if (
                     balancePaid &&
                     paymentDateIsInPeriod(balanceDate)
                 ) {
-                    balancesReceived += balanceReceivedLkr;
+                    balancesReceived = addFiniteNumbers(
+                        balancesReceived,
+                        getPaymentAmountLkr(
+                            booking,
+                            "balance",
+                            "balanceAmount",
+                            "balanceAmountLkr"
+                        )
+                    );
                 }
             });
         return {
             depositsReceived,
             balancesReceived,
-            totalReceived:
-                depositsReceived +
-                balancesReceived,
+            totalReceived: addFiniteNumbers(
+                depositsReceived,
+                balancesReceived
+            ),
             outstanding
         };
     }
@@ -1205,18 +1334,25 @@
                         bookingNights
                     );
 
-                groups[guests].bookings +=
-                    1;
+                groups[guests].bookings = addFiniteNumbers(
+                    groups[guests].bookings,
+                    1
+                );
 
-                groups[guests].bookedNights +=
-                    overlapNights;
+                groups[guests].bookedNights = addFiniteNumbers(
+                    groups[guests].bookedNights,
+                    overlapNights
+                );
 
-                groups[guests].guestNights +=
-                    guests *
-                    overlapNights;
+                groups[guests].guestNights = addFiniteNumbers(
+                    groups[guests].guestNights,
+                    multiplyFiniteNumbers(guests, overlapNights) ?? 0
+                );
 
-                groups[guests].revenue +=
-                    revenue.total;
+                groups[guests].revenue = addFiniteNumbers(
+                    groups[guests].revenue,
+                    revenue.total
+                );
             }
         );
 
@@ -1244,9 +1380,12 @@
                 period
             );
 
-        const netProfit =
+        const netProfitValue =
             income.total -
             expenses.total;
+        const netProfit = Number.isFinite(netProfitValue)
+            ? netProfitValue
+            : 0;
 
         const availableNights =
             daysBetween(
@@ -1256,39 +1395,30 @@
                 )
             );
 
-        const occupancyRate =
-            availableNights > 0
-                ? (
-                    income.bookedNights /
-                    availableNights
-                ) * 100
-                : 0;
+        const occupancyRate = multiplyFiniteNumbers(
+            divideFiniteNumbers(income.bookedNights, availableNights),
+            100
+        ) ?? 0;
 
-        const profitMargin =
-            income.total > 0
-                ? (
-                    netProfit /
-                    income.total
-                ) * 100
-                : 0;
+        const profitMargin = multiplyFiniteNumbers(
+            divideFiniteNumbers(netProfit, income.total),
+            100
+        ) ?? 0;
 
-        const revenuePerNight =
-            income.bookedNights > 0
-                ? income.total /
-                  income.bookedNights
-                : 0;
+        const revenuePerNight = divideFiniteNumbers(
+            income.total,
+            income.bookedNights
+        );
 
-        const expensePerNight =
-            income.bookedNights > 0
-                ? expenses.total /
-                  income.bookedNights
-                : 0;
+        const expensePerNight = divideFiniteNumbers(
+            expenses.total,
+            income.bookedNights
+        );
 
-        const profitPerNight =
-            income.bookedNights > 0
-                ? netProfit /
-                  income.bookedNights
-                : 0;
+        const profitPerNight = divideFiniteNumbers(
+            netProfit,
+            income.bookedNights
+        );
 
         const payments =
             calculatePayments(
@@ -1297,35 +1427,30 @@
                 state.bookings || []
             );
 
-        const averageGuestsPerBooking =
-            income.guestDataBookings > 0
-                ? income.totalGuests /
-                  income.guestDataBookings
-                : 0;
+        const averageGuestsPerBooking = divideFiniteNumbers(
+            income.totalGuests,
+            income.guestDataBookings
+        );
 
-        const revenuePerGuest =
-            income.totalGuests > 0
-                ? income.total /
-                  income.totalGuests
-                : 0;
+        const revenuePerGuest = divideFiniteNumbers(
+            income.total,
+            income.totalGuests
+        );
 
-        const revenuePerGuestNight =
-            income.guestNights > 0
-                ? income.total /
-                  income.guestNights
-                : 0;
+        const revenuePerGuestNight = divideFiniteNumbers(
+            income.total,
+            income.guestNights
+        );
 
-        const averageBookingValue =
-            bookings.length > 0
-                ? income.total /
-                  bookings.length
-                : 0;
+        const averageBookingValue = divideFiniteNumbers(
+            income.total,
+            bookings.length
+        );
 
-        const averageStay =
-            bookings.length > 0
-                ? income.totalStayNights /
-                  bookings.length
-                : 0;
+        const averageStay = divideFiniteNumbers(
+            income.totalStayNights,
+            bookings.length
+        );
 
         const revenueByGuestCount =
             calculateRevenueByGuestCount(
@@ -1333,9 +1458,22 @@
                 period
             );
 
+        const dashboardBookings = bookings.map(
+            booking => Object.fromEntries(
+                Object.entries(booking).map(
+                    ([key, value]) => [
+                        key,
+                        typeof value === "number" && !Number.isFinite(value)
+                            ? null
+                            : value
+                    ]
+                )
+            )
+        );
+
         return {
             period,
-            bookings,
+            bookings: dashboardBookings,
             income,
             expenses,
             netProfit,
