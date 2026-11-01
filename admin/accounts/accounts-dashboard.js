@@ -612,6 +612,7 @@
         );
 
         let [accommodation, extraGuestFee, cleaningFeeAmount] = originalAmounts;
+        const missingComponentConversions = [false, false, false];
 
         if (currency !== "LKR") {
             const storedTotalLkr = parseFiniteNumber(booking.totalLkr);
@@ -633,23 +634,44 @@
             if (allComponentEquivalentsStored) {
                 [accommodation, extraGuestFee, cleaningFeeAmount] = componentStoredLkr;
             } else if (storedTotalMatchesSign && originalTotal !== 0) {
-                [accommodation, extraGuestFee, cleaningFeeAmount] = originalAmounts.map(
-                    amount =>
-                        multiplyFiniteNumbers(
+                const allocatedAmounts = originalAmounts.map(
+                    (amount, index) => {
+                        const allocatedAmount = multiplyFiniteNumbers(
                             storedTotalLkr,
                             amount / originalTotal
-                        ) ?? 0
+                        );
+
+                        if (allocatedAmount === null && amount > 0) {
+                            missingComponentConversions[index] = true;
+                        }
+
+                        return allocatedAmount ?? 0;
+                    }
                 );
+                [accommodation, extraGuestFee, cleaningFeeAmount] = allocatedAmounts;
             } else {
-                [accommodation, extraGuestFee, cleaningFeeAmount] = originalAmounts.map(
-                    (amount, index) =>
-                        getLkrEquivalent(
+                const convertedAmounts = originalAmounts.map(
+                    (amount, index) => {
+                        if (amount === 0) {
+                            return 0;
+                        }
+
+                        const equivalent = getLkrEquivalent(
                             amount,
                             currency,
                             booking.exchangeRateToLkr,
                             componentStoredLkr[index]
-                        ) ?? 0
+                        );
+
+                        if (equivalent === null || equivalent < 0) {
+                            missingComponentConversions[index] = true;
+                            return 0;
+                        }
+
+                        return equivalent;
+                    }
                 );
+                [accommodation, extraGuestFee, cleaningFeeAmount] = convertedAmounts;
             }
         }
 
@@ -676,13 +698,25 @@
                 booking.checkout
             );
 
-        if (
+        const cleaningFeeInPeriod = Boolean(
             checkout &&
             checkout >= period.from &&
             checkout <= period.to
-        ) {
+        );
+
+        if (cleaningFeeInPeriod) {
             cleaningFee = parseFiniteNumber(cleaningFeeAmount) ?? 0;
         }
+
+        const missingConversion = Boolean(
+            (bookingNights > 0 && (
+                (originalAmounts[0] > 0 && missingComponentConversions[0]) ||
+                (originalAmounts[1] > 0 && missingComponentConversions[1])
+            )) ||
+            (cleaningFeeInPeriod &&
+                originalAmounts[2] > 0 &&
+                missingComponentConversions[2])
+        );
 
         return {
             accommodation:
@@ -692,6 +726,8 @@
                 extraGuestShare,
 
             cleaningFee,
+
+            missingConversion,
 
             total: addFiniteNumbers(
                 addFiniteNumbers(accommodationShare, extraGuestShare),
@@ -717,6 +753,7 @@
         let guestDataBookings = 0;
 
         let totalStayNights = 0;
+        const missingBookingConversions = new Set();
 
         bookings.forEach(
             booking => {
@@ -767,6 +804,12 @@
                         overlapNights,
                         bookingNights
                     );
+
+                if (revenue.missingConversion) {
+                    missingBookingConversions.add(
+                        booking.id ?? booking
+                    );
+                }
 
                 accommodation = addFiniteNumbers(
                     accommodation,
@@ -824,7 +867,8 @@
             totalGuests,
             guestNights,
             guestDataBookings,
-            totalStayNights
+            totalStayNights,
+            missingBookingConversions: missingBookingConversions.size
         };
     }
 
@@ -1013,7 +1057,10 @@
         let depositsReceived = 0;
         let balancesReceived = 0;
         let outstanding = 0;
-        let incompleteOutstandingBookings = 0;
+        const incompleteOutstandingBookings = new Set();
+        const missingBookingTotalConversions = new Set();
+        const incompleteOutstandingBookingsDueToBookingTotal = new Set();
+        const incompleteOutstandingBookingsDueToPaymentConversion = new Set();
         const missingPaymentConversionsByBooking = new Map();
 
         const recordMissingPaymentConversion = (booking, paymentType) => {
@@ -1156,16 +1203,24 @@
             }
 
             const originalTotal = parseFiniteNumber(booking.total);
-            if (originalTotal === null || originalTotal <= 0) {
+            if (originalTotal === null || originalTotal < 0) {
+                return null;
+            }
+
+            if (originalTotal === 0) {
                 return 0;
             }
 
-            return getLkrEquivalent(
+            const equivalent = getLkrEquivalent(
                 originalTotal,
                 booking.currency || "AUD",
                 booking.exchangeRateToLkr,
                 null
-            ) ?? 0;
+            );
+
+            return equivalent !== null && equivalent >= 0
+                ? equivalent
+                : null;
         };
 
         const hasPaymentStatus = (booking, type) =>
@@ -1217,6 +1272,17 @@
                     )
                     : 0;
 
+                const totalLkr = getBookingTotalLkr(booking);
+                const bookingKey = booking.id ?? booking;
+
+                if (totalLkr === null) {
+                    missingBookingTotalConversions.add(bookingKey);
+                    incompleteOutstandingBookings.add(bookingKey);
+                    incompleteOutstandingBookingsDueToBookingTotal.add(
+                        bookingKey
+                    );
+                }
+
                 if (depositLkr === null || balanceLkr === null) {
                     if (depositLkr === null) {
                         recordMissingPaymentConversion(
@@ -1231,11 +1297,20 @@
                         );
                     }
 
-                    incompleteOutstandingBookings += 1;
+                    incompleteOutstandingBookingsDueToPaymentConversion.add(
+                        bookingKey
+                    );
+                    incompleteOutstandingBookings.add(bookingKey);
+                }
+
+                if (totalLkr === null) {
                     return;
                 }
 
-                const totalLkr = getBookingTotalLkr(booking);
+                if (depositLkr === null || balanceLkr === null) {
+                    return;
+                }
+
                 const remaining = totalLkr - depositLkr - balanceLkr;
                 const bookingOutstanding = Number.isFinite(remaining)
                     ? Math.max(0, remaining)
@@ -1340,7 +1415,13 @@
             ),
             outstanding,
             missingPaymentConversions,
-            incompleteOutstandingBookings
+            incompleteOutstandingBookings: incompleteOutstandingBookings.size,
+            incompleteOutstandingBookingsDueToPaymentConversion:
+                incompleteOutstandingBookingsDueToPaymentConversion.size,
+            missingBookingTotalConversions:
+                missingBookingTotalConversions.size,
+            incompleteOutstandingBookingsDueToBookingTotal:
+                incompleteOutstandingBookingsDueToBookingTotal.size
         };
     }
 
@@ -1741,6 +1822,23 @@
             )
         );
 
+        let bookingConversionWarning = document.getElementById(
+            "bookingConversionWarning"
+        );
+        if (!bookingConversionWarning) {
+            bookingConversionWarning = document.createElement("div");
+            bookingConversionWarning.id = "bookingConversionWarning";
+            bookingConversionWarning.setAttribute("role", "status");
+            const revenueKpi = document.getElementById("kpiRevenue");
+            if (revenueKpi?.parentElement) {
+                revenueKpi.parentElement.appendChild(bookingConversionWarning);
+            }
+        }
+        bookingConversionWarning.textContent =
+            result.income.missingBookingConversions > 0
+                ? `${result.income.missingBookingConversions} booking(s) excluded from LKR revenue reporting because their booking currency conversion could not be determined.`
+                : "";
+
         let conversionWarning = document.getElementById("expenseConversionWarning");
         if (!conversionWarning) {
             conversionWarning = document.createElement("div");
@@ -1783,9 +1881,16 @@
                 `${result.payments.missingPaymentConversions} paid payment conversion(s) could not be determined; unconverted amounts are omitted from payment totals.`
             );
         }
-        if (result.payments.incompleteOutstandingBookings > 0) {
+        if (result.payments.incompleteOutstandingBookingsDueToPaymentConversion > 0) {
             paymentWarningMessages.push(
-                `Outstanding balance is incomplete: ${result.payments.incompleteOutstandingBookings} booking(s) with an unconverted paid payment are excluded.`
+                `Outstanding balance is incomplete: ${result.payments.incompleteOutstandingBookingsDueToPaymentConversion} booking(s) with an unconverted paid payment are excluded.`
+            );
+        }
+        if (
+            result.payments.incompleteOutstandingBookingsDueToBookingTotal > 0
+        ) {
+            paymentWarningMessages.push(
+                `Outstanding balance is incomplete for ${result.payments.incompleteOutstandingBookingsDueToBookingTotal} booking(s) because the booking total could not be converted to LKR.`
             );
         }
         paymentConversionWarning.textContent =

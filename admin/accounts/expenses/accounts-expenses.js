@@ -1122,6 +1122,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 expenseReference.value
             ).toLowerCase();
 
+        const currency =
+            String(
+                expenseCurrency.value || "AUD"
+            ).trim().toUpperCase();
+
         return expenses.find(expense => {
 
             if (
@@ -1153,6 +1158,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     expense.reference
                 ).toLowerCase() ===
                     reference &&
+
+                String(
+                    expense.currency || "AUD"
+                ).trim().toUpperCase() ===
+                    currency &&
 
                 expense.status ===
                     "Active"
