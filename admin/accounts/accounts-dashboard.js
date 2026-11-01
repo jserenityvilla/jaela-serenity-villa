@@ -1013,6 +1013,23 @@
         let depositsReceived = 0;
         let balancesReceived = 0;
         let outstanding = 0;
+        let incompleteOutstandingBookings = 0;
+        const missingPaymentConversionsByBooking = new Map();
+
+        const recordMissingPaymentConversion = (booking, paymentType) => {
+            let missingPaymentTypes =
+                missingPaymentConversionsByBooking.get(booking);
+
+            if (!missingPaymentTypes) {
+                missingPaymentTypes = new Set();
+                missingPaymentConversionsByBooking.set(
+                    booking,
+                    missingPaymentTypes
+                );
+            }
+
+            missingPaymentTypes.add(paymentType);
+        };
 
         const getPaymentAmountLkr = (
             booking,
@@ -1025,6 +1042,20 @@
             const hasPaymentAmount =
                 rawPaymentAmount !== undefined &&
                 rawPaymentAmount !== null;
+            const rawPaymentCurrency =
+                booking[`${paymentPrefix}Currency`];
+            const hasExplicitPaymentCurrency =
+                rawPaymentCurrency !== undefined &&
+                rawPaymentCurrency !== null &&
+                String(rawPaymentCurrency).trim() !== "";
+            const paymentCurrency = String(
+                hasExplicitPaymentCurrency
+                    ? rawPaymentCurrency
+                    : booking.currency || "AUD"
+            ).trim().toUpperCase();
+            const bookingCurrency = String(
+                booking.currency || "AUD"
+            ).trim().toUpperCase();
             const paymentAmount = parseFiniteNumber(rawPaymentAmount);
             const storedPaymentLkr = parseFiniteNumber(
                 booking[`${paymentPrefix}AmountLkr`]
@@ -1034,26 +1065,28 @@
                 storedPaymentLkr > 0;
 
             if (hasPaymentAmount) {
-                if (paymentAmount === null || paymentAmount <= 0) {
+                if (paymentAmount === null) {
+                    return null;
+                }
+                if (paymentAmount <= 0) {
                     return 0;
                 }
                 if (hasValidStoredPaymentLkr) {
                     return storedPaymentLkr;
                 }
 
-                const paymentCurrency = String(
-                    booking[`${paymentPrefix}Currency`] ||
-                    booking.currency ||
-                    "AUD"
-                ).toUpperCase();
                 const paymentRate =
                     getValidExchangeRate(
                         paymentCurrency,
                         booking[`${paymentPrefix}ExchangeRateToLkr`]
                     ) ??
-                    getValidExchangeRate(
-                        paymentCurrency,
-                        booking.exchangeRateToLkr
+                    (
+                        paymentCurrency === bookingCurrency
+                            ? getValidExchangeRate(
+                                bookingCurrency,
+                                booking.exchangeRateToLkr
+                            )
+                            : null
                     );
                 const paymentEquivalent = getLkrEquivalent(
                     paymentAmount,
@@ -1065,6 +1098,19 @@
                 if (paymentEquivalent !== null) {
                     return paymentEquivalent;
                 }
+
+                return null;
+            }
+
+            if (hasValidStoredPaymentLkr) {
+                return storedPaymentLkr;
+            }
+
+            if (
+                hasExplicitPaymentCurrency &&
+                paymentCurrency !== bookingCurrency
+            ) {
+                return null;
             }
 
             const rawLegacyAmount = booking[legacyAmountField];
@@ -1080,7 +1126,10 @@
                 legacyStoredLkr > 0;
 
             if (hasLegacyAmount) {
-                if (legacyAmount === null || legacyAmount <= 0) {
+                if (legacyAmount === null) {
+                    return null;
+                }
+                if (legacyAmount <= 0) {
                     return 0;
                 }
                 if (hasValidLegacyStoredLkr) {
@@ -1089,19 +1138,15 @@
 
                 return getLkrEquivalent(
                     legacyAmount,
-                    booking.currency || "AUD",
+                    String(booking.currency || "AUD").trim().toUpperCase(),
                     booking.exchangeRateToLkr,
                     null
-                ) ?? 0;
-            }
-
-            if (hasValidStoredPaymentLkr) {
-                return storedPaymentLkr;
+                );
             }
 
             return hasValidLegacyStoredLkr
                 ? legacyStoredLkr
-                : 0;
+                : null;
         };
 
         const getBookingTotalLkr = booking => {
@@ -1153,36 +1198,52 @@
                 );
         };
 
-        const bookingOutstandingLkr = booking => {
-            const totalLkr = getBookingTotalLkr(booking);
-            const depositLkr = isDepositPaid(booking)
-                ? getPaymentAmountLkr(
-                    booking,
-                    "deposit",
-                    "depositAmount",
-                    "depositAmountLkr"
-                )
-                : 0;
-            const balanceLkr = isBalancePaid(booking)
-                ? getPaymentAmountLkr(
-                    booking,
-                    "balance",
-                    "balanceAmount",
-                    "balanceAmountLkr"
-                )
-                : 0;
-            const remaining = totalLkr - depositLkr - balanceLkr;
-
-            return Number.isFinite(remaining)
-                ? Math.max(0, remaining)
-                : 0;
-        };
-
         bookings.forEach(
             booking => {
+                const depositLkr = isDepositPaid(booking)
+                    ? getPaymentAmountLkr(
+                        booking,
+                        "deposit",
+                        "depositAmount",
+                        "depositAmountLkr"
+                    )
+                    : 0;
+                const balanceLkr = isBalancePaid(booking)
+                    ? getPaymentAmountLkr(
+                        booking,
+                        "balance",
+                        "balanceAmount",
+                        "balanceAmountLkr"
+                    )
+                    : 0;
+
+                if (depositLkr === null || balanceLkr === null) {
+                    if (depositLkr === null) {
+                        recordMissingPaymentConversion(
+                            booking,
+                            "deposit"
+                        );
+                    }
+                    if (balanceLkr === null) {
+                        recordMissingPaymentConversion(
+                            booking,
+                            "balance"
+                        );
+                    }
+
+                    incompleteOutstandingBookings += 1;
+                    return;
+                }
+
+                const totalLkr = getBookingTotalLkr(booking);
+                const remaining = totalLkr - depositLkr - balanceLkr;
+                const bookingOutstanding = Number.isFinite(remaining)
+                    ? Math.max(0, remaining)
+                    : 0;
+
                 outstanding = addFiniteNumbers(
                     outstanding,
-                    bookingOutstandingLkr(booking)
+                    bookingOutstanding
                 );
             }
         );
@@ -1218,32 +1279,58 @@
                     depositPaid &&
                     paymentDateIsInPeriod(depositDate)
                 ) {
-                    depositsReceived = addFiniteNumbers(
-                        depositsReceived,
-                        getPaymentAmountLkr(
-                            booking,
-                            "deposit",
-                            "depositAmount",
-                            "depositAmountLkr"
-                        )
+                    const depositLkr = getPaymentAmountLkr(
+                        booking,
+                        "deposit",
+                        "depositAmount",
+                        "depositAmountLkr"
                     );
+
+                    if (depositLkr === null) {
+                        recordMissingPaymentConversion(
+                            booking,
+                            "deposit"
+                        );
+                    } else {
+                        depositsReceived = addFiniteNumbers(
+                            depositsReceived,
+                            depositLkr
+                        );
+                    }
                 }
 
                 if (
                     balancePaid &&
                     paymentDateIsInPeriod(balanceDate)
                 ) {
-                    balancesReceived = addFiniteNumbers(
-                        balancesReceived,
-                        getPaymentAmountLkr(
-                            booking,
-                            "balance",
-                            "balanceAmount",
-                            "balanceAmountLkr"
-                        )
+                    const balanceLkr = getPaymentAmountLkr(
+                        booking,
+                        "balance",
+                        "balanceAmount",
+                        "balanceAmountLkr"
                     );
+
+                    if (balanceLkr === null) {
+                        recordMissingPaymentConversion(
+                            booking,
+                            "balance"
+                        );
+                    } else {
+                        balancesReceived = addFiniteNumbers(
+                            balancesReceived,
+                            balanceLkr
+                        );
+                    }
                 }
             });
+        const missingPaymentConversions = Array.from(
+            missingPaymentConversionsByBooking.values()
+        ).reduce(
+            (total, paymentTypes) =>
+                total + paymentTypes.size,
+            0
+        );
+
         return {
             depositsReceived,
             balancesReceived,
@@ -1251,7 +1338,9 @@
                 depositsReceived,
                 balancesReceived
             ),
-            outstanding
+            outstanding,
+            missingPaymentConversions,
+            incompleteOutstandingBookings
         };
     }
 
@@ -1665,6 +1754,42 @@
         conversionWarning.textContent = result.expenses.missingConversions > 0
             ? `${result.expenses.missingConversions} active expense or utility record(s) excluded: missing a valid historical AUD-to-LKR conversion.`
             : "";
+
+        let paymentConversionWarning = document.getElementById(
+            "paymentConversionWarning"
+        );
+        if (!paymentConversionWarning) {
+            paymentConversionWarning = document.createElement("div");
+            paymentConversionWarning.id = "paymentConversionWarning";
+            paymentConversionWarning.setAttribute("role", "alert");
+            paymentConversionWarning.style.color = "#b42318";
+            paymentConversionWarning.style.fontSize = ".9rem";
+            paymentConversionWarning.style.marginTop = "8px";
+            const outstandingKpi = document.getElementById(
+                "paymentsOutstanding"
+            );
+            const paymentSection =
+                outstandingKpi?.parentElement?.parentElement;
+            if (paymentSection) {
+                paymentSection.appendChild(
+                    paymentConversionWarning
+                );
+            }
+        }
+
+        const paymentWarningMessages = [];
+        if (result.payments.missingPaymentConversions > 0) {
+            paymentWarningMessages.push(
+                `${result.payments.missingPaymentConversions} paid payment conversion(s) could not be determined; unconverted amounts are omitted from payment totals.`
+            );
+        }
+        if (result.payments.incompleteOutstandingBookings > 0) {
+            paymentWarningMessages.push(
+                `Outstanding balance is incomplete: ${result.payments.incompleteOutstandingBookings} booking(s) with an unconverted paid payment are excluded.`
+            );
+        }
+        paymentConversionWarning.textContent =
+            paymentWarningMessages.join(" ");
 
         setText(
             "kpiProfit",
