@@ -1615,6 +1615,42 @@
         );
     }
 
+    function resetPaymentExchangeRateOnCurrencyChange(
+        currencyElementId,
+        exchangeRateElementId,
+        recalculate
+    ) {
+        const currencyElement =
+            document.getElementById(currencyElementId);
+        const exchangeRateElement =
+            document.getElementById(exchangeRateElementId);
+
+        if (!currencyElement || !exchangeRateElement) {
+            return;
+        }
+
+        currencyElement.addEventListener(
+            "change",
+            () => {
+                exchangeRateElement.value =
+                    currencyElement.value === "LKR" ? "1" : "";
+
+                recalculate();
+            }
+        );
+    }
+
+    resetPaymentExchangeRateOnCurrencyChange(
+        "addDepositPaymentCurrency",
+        "addDepositPaymentExchangeRate",
+        calculateAdminPaymentAmounts
+    );
+    resetPaymentExchangeRateOnCurrencyChange(
+        "addBalancePaymentCurrency",
+        "addBalancePaymentExchangeRate",
+        calculateAdminPaymentAmounts
+    );
+
     [
         "addDepositPaymentAmount",
         "addDepositPaymentCurrency",
@@ -1631,10 +1667,12 @@
                 calculateAdminPaymentAmounts
             );
 
-            element.addEventListener(
-                "change",
-                calculateAdminPaymentAmounts
-            );
+            if (!id.endsWith("Currency")) {
+                element.addEventListener(
+                    "change",
+                    calculateAdminPaymentAmounts
+                );
+            }
         }
     });
 
@@ -1697,6 +1735,17 @@
         );
     }
 
+    resetPaymentExchangeRateOnCurrencyChange(
+        "editDepositPaymentCurrency",
+        "editDepositPaymentExchangeRate",
+        calculateEditPaymentAmounts
+    );
+    resetPaymentExchangeRateOnCurrencyChange(
+        "editBalancePaymentCurrency",
+        "editBalancePaymentExchangeRate",
+        calculateEditPaymentAmounts
+    );
+
     [
         "editDepositPaymentAmount",
         "editDepositPaymentCurrency",
@@ -1713,10 +1762,12 @@
                 calculateEditPaymentAmounts
             );
 
-            element.addEventListener(
-                "change",
-                calculateEditPaymentAmounts
-            );
+            if (!id.endsWith("Currency")) {
+                element.addEventListener(
+                    "change",
+                    calculateEditPaymentAmounts
+                );
+            }
         }
     });
 
