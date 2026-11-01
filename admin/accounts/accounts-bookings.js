@@ -11,6 +11,42 @@
 
     const number = (value) => Number(value) || 0;
 
+    const parseFiniteNonNegativeNumber = (value) => {
+        if (typeof value !== "number" && typeof value !== "string") {
+            return null;
+        }
+
+        if (typeof value === "string" && value.trim() === "") {
+            return null;
+        }
+
+        const parsed = Number(value);
+
+        return Number.isFinite(parsed) && parsed >= 0
+            ? parsed
+            : null;
+    };
+
+    const calculateLkrEquivalent = (amount, exchangeRate) => {
+        const validAmount = parseFiniteNonNegativeNumber(amount);
+        const validRate = parseFiniteNonNegativeNumber(exchangeRate);
+
+        if (validAmount === null || validRate === null) {
+            return null;
+        }
+
+        const amountLkr = validAmount * validRate;
+
+        return Number.isFinite(amountLkr) && amountLkr >= 0
+            ? amountLkr
+            : null;
+    };
+
+    const isPositiveFiniteNumber = (value) =>
+        typeof value === "number" &&
+        Number.isFinite(value) &&
+        value > 0;
+
     const getGuestCount = (booking) => {
         const storedTotal = Number(booking.totalGuests);
 
@@ -116,9 +152,11 @@
             return getOutstandingLkr(booking);
         }
 
-        const exchangeRate = number(booking.exchangeRateToLkr);
+        const exchangeRate = parseFiniteNonNegativeNumber(
+            booking.exchangeRateToLkr
+        );
 
-        if (exchangeRate > 0) {
+        if (exchangeRate !== null && exchangeRate > 0) {
             return getOutstandingLkr(booking) / exchangeRate;
         }
 
@@ -135,9 +173,11 @@
     const getDepositPaidLkr = (booking) => {
         if (
             booking.depositPaymentStatus === "Paid" &&
-            number(booking.depositPaymentAmountLkr) > 0
+            parseFiniteNonNegativeNumber(booking.depositPaymentAmountLkr) > 0
         ) {
-            return number(booking.depositPaymentAmountLkr);
+            return parseFiniteNonNegativeNumber(
+                booking.depositPaymentAmountLkr
+            );
         }
 
         if (
@@ -148,7 +188,7 @@
                 booking.paymentStatus === "Balance Due"
             )
         ) {
-            return number(booking.depositAmountLkr);
+            return parseFiniteNonNegativeNumber(booking.depositAmountLkr) || 0;
         }
 
         return 0;
@@ -157,31 +197,40 @@
     const getBalancePaidLkr = (booking) => {
         if (
             booking.balancePaymentStatus === "Paid" &&
-            number(booking.balancePaymentAmountLkr) > 0
+            parseFiniteNonNegativeNumber(booking.balancePaymentAmountLkr) > 0
         ) {
-            return number(booking.balancePaymentAmountLkr);
+            return parseFiniteNonNegativeNumber(
+                booking.balancePaymentAmountLkr
+            );
         }
 
         if (booking.balancePaid === true) {
-            return number(booking.balanceAmountLkr);
+            return parseFiniteNonNegativeNumber(booking.balanceAmountLkr) || 0;
         }
 
         return 0;
     };
 
     const getTotalLkr = (booking) => {
-        if (number(booking.totalLkr) > 0) {
-            return number(booking.totalLkr);
+        const storedTotalLkr = parseFiniteNonNegativeNumber(booking.totalLkr);
+        if (storedTotalLkr !== null && storedTotalLkr > 0) {
+            return storedTotalLkr;
         }
 
-        const total = number(booking.total);
-        const exchangeRate = number(booking.exchangeRateToLkr);
+        const total = parseFiniteNonNegativeNumber(booking.total) || 0;
 
         if (booking.currency === "LKR") {
             return total;
         }
 
-        return total * exchangeRate;
+        const exchangeRate = parseFiniteNonNegativeNumber(
+            booking.exchangeRateToLkr
+        );
+        if (exchangeRate === null || exchangeRate <= 0) {
+            return 0;
+        }
+
+        return calculateLkrEquivalent(total, exchangeRate) || 0;
     };
 
     const getOutstandingLkr = (booking) => {
@@ -189,10 +238,11 @@
         const depositPaidLkr = getDepositPaidLkr(booking);
         const balancePaidLkr = getBalancePaidLkr(booking);
 
-        return Math.max(
-            0,
-            totalLkr - depositPaidLkr - balancePaidLkr
-        );
+        const outstandingLkr = totalLkr - depositPaidLkr - balancePaidLkr;
+
+        return Number.isFinite(outstandingLkr)
+            ? Math.max(0, outstandingLkr)
+            : 0;
     };
 
     const parseDate = (value) => {
@@ -763,11 +813,10 @@
                     ).value
                 ) || 0;
 
-        const depositPaymentAmountLkr =
-            depositPaymentCurrency === "LKR"
-                ? depositPaymentAmount
-                : depositPaymentAmount *
-                  depositPaymentExchangeRateToLkr;
+        const depositPaymentAmountLkr = calculateLkrEquivalent(
+            depositPaymentAmount,
+            depositPaymentExchangeRateToLkr
+        );
 
         const balancePaymentStatus =
             document.getElementById("editBalancePaymentStatus").value;
@@ -792,11 +841,10 @@
                     ).value
                 ) || 0;
 
-        const balancePaymentAmountLkr =
-            balancePaymentCurrency === "LKR"
-                ? balancePaymentAmount
-                : balancePaymentAmount *
-                  balancePaymentExchangeRateToLkr;
+        const balancePaymentAmountLkr = calculateLkrEquivalent(
+            balancePaymentAmount,
+            balancePaymentExchangeRateToLkr
+        );
 
         const validateActualPayment = (
             paymentName,
@@ -804,10 +852,25 @@
             currency,
             amount,
             paymentDate,
-            exchangeRate
+            exchangeRate,
+            amountLkr
         ) => {
+            if (amountLkr === null) {
+                errorElement.textContent =
+                    `${paymentName} LKR equivalent must be a finite, non-negative amount.`;
+                errorElement.style.display = "block";
+                return false;
+            }
+
             if (status !== "Paid") {
                 return true;
+            }
+
+            if (!Number.isFinite(amountLkr) || amountLkr <= 0) {
+                errorElement.textContent =
+                    `${paymentName} LKR equivalent must be greater than zero.`;
+                errorElement.style.display = "block";
+                return false;
             }
 
             if (!currency) {
@@ -817,7 +880,7 @@
                 return false;
             }
 
-            if (amount <= 0) {
+            if (!Number.isFinite(amount) || amount <= 0) {
                 errorElement.textContent =
                     `${paymentName} amount must be greater than zero.`;
                 errorElement.style.display = "block";
@@ -831,7 +894,10 @@
                 return false;
             }
 
-            if (currency !== "LKR" && exchangeRate <= 0) {
+            if (
+                currency !== "LKR" &&
+                !isPositiveFiniteNumber(exchangeRate)
+            ) {
                 errorElement.textContent =
                     `${paymentName} exchange rate to LKR is required for ${currency} payments.`;
                 errorElement.style.display = "block";
@@ -848,7 +914,8 @@
                 depositPaymentCurrency,
                 depositPaymentAmount,
                 depositPaymentDate,
-                depositPaymentExchangeRateToLkr
+                depositPaymentExchangeRateToLkr,
+                depositPaymentAmountLkr
             ) ||
             !validateActualPayment(
                 "Balance payment",
@@ -856,7 +923,8 @@
                 balancePaymentCurrency,
                 balancePaymentAmount,
                 balancePaymentDate,
-                balancePaymentExchangeRateToLkr
+                balancePaymentExchangeRateToLkr,
+                balancePaymentAmountLkr
             )
         ) {
             errorElement.scrollIntoView({
@@ -2060,7 +2128,10 @@ updateAdminTotalGuests();
             const exchangeRate = bookingCurrency === "LKR" ? 1 : Number(document.getElementById("addExchangeRate")?.value) || 0;
             const exchangeRateDate = document.getElementById("addExchangeRateDate")?.value || "";
 
-            if (bookingCurrency !== "LKR" && exchangeRate <= 0) {
+            if (
+                bookingCurrency !== "LKR" &&
+                !isPositiveFiniteNumber(exchangeRate)
+            ) {
                 const errorElement = document.getElementById("addBookingError");
                 if (errorElement) {
                     errorElement.textContent =
@@ -2078,9 +2149,34 @@ updateAdminTotalGuests();
                 return;
             }
 
-            const totalLkr = bookingCurrency === "LKR" ? total : total * exchangeRate;
-            const depositAmountLkr = bookingCurrency === "LKR" ? depositAmount : depositAmount * exchangeRate;
-            const balanceAmountLkr = bookingCurrency === "LKR" ? balanceAmount : balanceAmount * exchangeRate;
+            const totalLkr = calculateLkrEquivalent(total, exchangeRate);
+            const depositAmountLkr = calculateLkrEquivalent(
+                depositAmount,
+                exchangeRate
+            );
+            const balanceAmountLkr = calculateLkrEquivalent(
+                balanceAmount,
+                exchangeRate
+            );
+
+            if (
+                totalLkr === null ||
+                depositAmountLkr === null ||
+                balanceAmountLkr === null ||
+                totalLkr <= 0
+            ) {
+                const errorElement = document.getElementById("addBookingError");
+                if (errorElement) {
+                    errorElement.textContent =
+                        "Booking LKR equivalents must be finite valid amounts.";
+                    errorElement.style.display = "block";
+                }
+
+                isSavingAdminBooking = false;
+                saveBookingBtn.disabled = false;
+                saveBookingBtn.textContent = "Save Booking";
+                return;
+            }
 
             const depositPaymentStatus =
                 document.getElementById("addDepositPaymentStatus")?.value ||
@@ -2108,11 +2204,10 @@ updateAdminTotalGuests();
                         )?.value
                     ) || 0;
 
-            const depositPaymentAmountLkr =
-                depositPaymentCurrency === "LKR"
-                    ? depositPaymentAmount
-                    : depositPaymentAmount *
-                      depositPaymentExchangeRateToLkr;
+            const depositPaymentAmountLkr = calculateLkrEquivalent(
+                depositPaymentAmount,
+                depositPaymentExchangeRateToLkr
+            );
 
             const balancePaymentStatus =
                 document.getElementById("addBalancePaymentStatus")?.value ||
@@ -2140,11 +2235,10 @@ updateAdminTotalGuests();
                         )?.value
                     ) || 0;
 
-            const balancePaymentAmountLkr =
-                balancePaymentCurrency === "LKR"
-                    ? balancePaymentAmount
-                    : balancePaymentAmount *
-                      balancePaymentExchangeRateToLkr;
+            const balancePaymentAmountLkr = calculateLkrEquivalent(
+                balancePaymentAmount,
+                balancePaymentExchangeRateToLkr
+            );
 
             const addPaymentError =
                 document.getElementById("addBookingError");
@@ -2155,10 +2249,29 @@ updateAdminTotalGuests();
                 currency,
                 amount,
                 paymentDate,
-                exchangeRate
+                exchangeRate,
+                amountLkr
             ) => {
+                if (amountLkr === null) {
+                    if (addPaymentError) {
+                        addPaymentError.textContent =
+                            `${paymentName} LKR equivalent must be a finite, non-negative amount.`;
+                        addPaymentError.style.display = "block";
+                    }
+                    return false;
+                }
+
                 if (status !== "Paid") {
                     return true;
+                }
+
+                if (!Number.isFinite(amountLkr) || amountLkr <= 0) {
+                    if (addPaymentError) {
+                        addPaymentError.textContent =
+                            `${paymentName} LKR equivalent must be greater than zero.`;
+                        addPaymentError.style.display = "block";
+                    }
+                    return false;
                 }
 
                 if (!currency) {
@@ -2170,7 +2283,7 @@ updateAdminTotalGuests();
                     return false;
                 }
 
-                if (amount <= 0) {
+                if (!Number.isFinite(amount) || amount <= 0) {
                     if (addPaymentError) {
                         addPaymentError.textContent =
                             `${paymentName} amount must be greater than zero.`;
@@ -2188,7 +2301,10 @@ updateAdminTotalGuests();
                     return false;
                 }
 
-                if (currency !== "LKR" && exchangeRate <= 0) {
+                if (
+                    currency !== "LKR" &&
+                    !isPositiveFiniteNumber(exchangeRate)
+                ) {
                     if (addPaymentError) {
                         addPaymentError.textContent =
                             `${paymentName} exchange rate to LKR is required for ${currency} payments.`;
@@ -2207,7 +2323,8 @@ updateAdminTotalGuests();
                     depositPaymentCurrency,
                     depositPaymentAmount,
                     depositPaymentDate,
-                    depositPaymentExchangeRateToLkr
+                    depositPaymentExchangeRateToLkr,
+                    depositPaymentAmountLkr
                 ) ||
                 !validateActualPayment(
                     "Balance payment",
@@ -2215,7 +2332,8 @@ updateAdminTotalGuests();
                     balancePaymentCurrency,
                     balancePaymentAmount,
                     balancePaymentDate,
-                    balancePaymentExchangeRateToLkr
+                    balancePaymentExchangeRateToLkr,
+                    balancePaymentAmountLkr
                 )
             ) {
                 addPaymentError?.scrollIntoView({
