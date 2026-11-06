@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const utilityCurrency =
         document.getElementById("utilityCurrency");
 
+    const utilityExchangeRateToLkr =
+        document.getElementById("utilityExchangeRateToLkr");
+
     const utilityUsage =
         document.getElementById("utilityUsage");
 
@@ -127,8 +130,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             .replace(/'/g, "&#039;");
     }
 
-    function formatAmount(amount) {
-        return `AUD ${Number(amount || 0).toFixed(2)}`;
+    function formatAmount(amount, currency = "AUD") {
+        return `${currency} ${Number(amount || 0).toFixed(2)}`;
     }
 
     function getCategory(categoryId) {
@@ -176,57 +179,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 bill => bill.status === "Active"
             );
 
-        const fixedTotal =
-            activeBills
-                .filter(
-                    bill =>
-                        bill.expenseClassification ===
-                        "Fixed Property"
-                )
-                .reduce(
-                    (sum, bill) =>
-                        sum + Number(bill.amount || 0),
-                    0
-                );
-
-        const variableTotal =
-            activeBills
-                .filter(
-                    bill =>
-                        bill.expenseClassification ===
-                        "Variable Property"
-                )
-                .reduce(
-                    (sum, bill) =>
-                        sum + Number(bill.amount || 0),
-                    0
-                );
-
-        const otherTotal =
-            activeBills
-                .filter(
-                    bill =>
-                        bill.expenseClassification ===
-                        "Other"
-                )
-                .reduce(
-                    (sum, bill) =>
-                        sum + Number(bill.amount || 0),
-                    0
-                );
-
-        const activeTotal =
-            activeBills.reduce(
-                (sum, bill) =>
-                    sum + Number(bill.amount || 0),
-                0
+        const currencies = [...new Set(activeBills.map(bill =>
+            String(bill.currency || "AUD").toUpperCase()
+        ))];
+        utilitySummary.textContent = currencies.map(currency => {
+            const bills = activeBills.filter(bill =>
+                String(bill.currency || "AUD").toUpperCase() === currency
             );
-
-        utilitySummary.textContent =
-            `Active Bills: ${formatAmount(activeTotal)} | ` +
-            `Fixed Property: ${formatAmount(fixedTotal)} | ` +
-            `Variable Property: ${formatAmount(variableTotal)} | ` +
-            `Other: ${formatAmount(otherTotal)}`;
+            const sum = predicate => bills
+                .filter(predicate)
+                .reduce((total, bill) => total + Number(bill.amount || 0), 0);
+            return `${currency}: Active Bills ${formatAmount(sum(() => true), currency)} | ` +
+                `Fixed Property ${formatAmount(sum(bill => bill.expenseClassification === "Fixed Property"), currency)} | ` +
+                `Variable Property ${formatAmount(sum(bill => bill.expenseClassification === "Variable Property"), currency)} | ` +
+                `Other ${formatAmount(sum(bill => bill.expenseClassification === "Other"), currency)}`;
+        }).join(" || ") || "No active utility bills";
     }
 
     function populateUtilityControls() {
@@ -461,7 +428,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     formatBillingPeriod(bill)
                 )}</td>
                 <td>${escapeHtml(
-                    formatAmount(bill.amount)
+                    formatAmount(bill.amount, bill.currency || "AUD")
                 )}</td>
                 <td>${escapeHtml(
                     bill.supplier || "—"
@@ -592,6 +559,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                             Number(data.amount) || 0,
                         currency:
                             data.currency || "AUD",
+                        exchangeRateToLkr:
+                            data.exchangeRateToLkr ?? null,
+                        amountLkr:
+                            data.amountLkr ?? null,
                         usage:
                             data.usage === null ||
                             data.usage === undefined ||
@@ -726,6 +697,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         utilityAmount.value =
             bill.amount || "";
+
+        const savedExchangeRate = bill.exchangeRateToLkr;
+        const isValidRateString =
+            typeof savedExchangeRate === "string" &&
+            /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(
+                savedExchangeRate.trim()
+            );
+        const parsedExchangeRate =
+            typeof savedExchangeRate === "number"
+                ? savedExchangeRate
+                : isValidRateString
+                    ? Number(savedExchangeRate)
+                    : NaN;
+
+        utilityExchangeRateToLkr.value =
+            Number.isFinite(parsedExchangeRate) && parsedExchangeRate > 0
+                ? String(parsedExchangeRate)
+                : "";
 
         utilityCurrency.value =
             bill.currency || "AUD";
@@ -898,6 +887,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             return false;
         }
 
+        const exchangeRate = Number(utilityExchangeRateToLkr.value);
+        if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
+            alert("Enter a valid AUD to LKR exchange rate greater than zero.");
+            utilityExchangeRateToLkr.focus();
+            return false;
+        }
+
         const validClassifications = [
             "Fixed Property",
             "Variable Property",
@@ -1062,6 +1058,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         return true;
     }
 
+    function calculateAmountLkr(amount, exchangeRateToLkr) {
+        const unroundedAmountLkr =
+            amount * exchangeRateToLkr;
+
+        if (
+            !Number.isFinite(unroundedAmountLkr) ||
+            unroundedAmountLkr <= 0
+        ) {
+            return null;
+        }
+
+        const amountLkr =
+            Number(
+                unroundedAmountLkr.toFixed(2)
+            );
+
+        return Number.isFinite(amountLkr) && amountLkr > 0
+            ? amountLkr
+            : null;
+    }
+
     async function saveUtilityBill() {
 
         if (!validateUtilityFields()) {
@@ -1141,6 +1158,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
+        const amount = Number(Number(utilityAmount.value).toFixed(2));
+        const exchangeRateToLkr = Number(utilityExchangeRateToLkr.value);
+        const amountLkr = calculateAmountLkr(
+            amount,
+            exchangeRateToLkr
+        );
+
+        if (amountLkr === null) {
+            alert("The calculated LKR equivalent is invalid. Check the amount and exchange rate.");
+            utilityExchangeRateToLkr.focus();
+            return;
+        }
+
         const saveButton =
             utilityForm.querySelector(
                 'button[type="submit"]'
@@ -1152,6 +1182,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
 
             const data = {
+
+                amount,
+
+                currency: utilityCurrency.value,
+
+                exchangeRateToLkr,
+
+                amountLkr,
 
                 categoryId:
                     utilityCategory.value,
@@ -1167,16 +1205,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 dueDate:
                     utilityDueDate.value,
-
-                amount:
-                    Number(
-                        Number(
-                            utilityAmount.value
-                        ).toFixed(2)
-                    ),
-
-                currency:
-                    utilityCurrency.value,
 
                 usage:
                     String(
