@@ -58,3 +58,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+// Shared logout handler used by the Admin Portal landing page and accounting navigation.
+window.adminSignOut = async function adminSignOut() {
+    try {
+        if (!window.firebase || !firebase.apps || !firebase.apps.length) {
+            throw new Error("Firebase authentication is not initialised.");
+        }
+
+        await firebase.auth().signOut();
+
+        const targetLoginPath =
+            document.body.dataset.adminLoginPath || "../login.html";
+
+        window.location.assign(
+            new URL(targetLoginPath, window.location.href).toString()
+        );
+    } catch (error) {
+        console.error("Admin sign-out failed:", error);
+        window.alert("Unable to log out. Please try again.");
+    }
+};
