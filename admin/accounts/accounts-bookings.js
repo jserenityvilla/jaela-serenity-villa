@@ -11,6 +11,105 @@
 
     const number = (value) => Number(value) || 0;
 
+    const DEFAULT_EXCHANGE_RATES_TO_LKR = Object.freeze({
+        AUD: 225,
+        USD: 330
+    });
+
+    function calculateOverallPaymentStatus(totalLkr, depositPaidLkr, balancePaidLkr) {
+        const total = Number(totalLkr);
+        const depositPaid = Number(depositPaidLkr);
+        const balancePaid = Number(balancePaidLkr);
+
+        const validTotal = Number.isFinite(total) && total > 0 ? total : 0;
+        const validDepositPaid =
+            Number.isFinite(depositPaid) && depositPaid > 0 ? depositPaid : 0;
+        const validBalancePaid =
+            Number.isFinite(balancePaid) && balancePaid > 0 ? balancePaid : 0;
+        const totalReceived = validDepositPaid + validBalancePaid;
+
+        // Allow one cent for currency rounding and floating-point residue.
+        if (validTotal > 0 && totalReceived >= validTotal - 0.01) {
+            return "Paid";
+        }
+
+        if (validBalancePaid > 0) {
+            return "Balance Due";
+        }
+
+        if (validDepositPaid > 0) {
+            return "Deposit Paid";
+        }
+
+        return "Deposit Required";
+    }
+
+    const hasActualPaymentAmounts = (booking, paymentPrefix) => {
+        return (
+            Object.prototype.hasOwnProperty.call(
+                booking,
+                `${paymentPrefix}PaymentAmount`
+            ) ||
+            Object.prototype.hasOwnProperty.call(
+                booking,
+                `${paymentPrefix}PaymentAmountLkr`
+            )
+        );
+    };
+
+    const getActualPaymentAmountLkr = (booking, paymentPrefix) => {
+        if (!hasActualPaymentAmounts(booking, paymentPrefix)) {
+            return null;
+        }
+
+        if (booking[`${paymentPrefix}PaymentStatus`] !== "Paid") {
+            return 0;
+        }
+
+        const storedAmountLkr = parseFiniteNonNegativeNumber(
+            booking[`${paymentPrefix}PaymentAmountLkr`]
+        );
+        if (storedAmountLkr !== null) {
+            return storedAmountLkr;
+        }
+
+        const amount = parseFiniteNonNegativeNumber(
+            booking[`${paymentPrefix}PaymentAmount`]
+        );
+        if (amount === null) {
+            return 0;
+        }
+
+        const paymentCurrency = String(
+            booking[`${paymentPrefix}PaymentCurrency`] ||
+                booking.currency ||
+                ""
+        ).toUpperCase();
+
+        if (paymentCurrency === "LKR") {
+            return amount;
+        }
+
+        const paymentRate = parseFiniteNonNegativeNumber(
+            booking[`${paymentPrefix}PaymentExchangeRateToLkr`]
+        );
+        const bookingCurrency = String(
+            booking.currency || "AUD"
+        ).toUpperCase();
+        const exchangeRate = paymentRate !== null && paymentRate > 0
+            ? paymentRate
+            : paymentCurrency === bookingCurrency
+                ? parseFiniteNonNegativeNumber(booking.exchangeRateToLkr)
+                : null;
+
+        if (exchangeRate === null || exchangeRate <= 0) {
+            return 0;
+        }
+
+        return calculateLkrEquivalent(amount, exchangeRate) || 0;
+    };
+
+
     const parseFiniteNonNegativeNumber = (value) => {
         if (typeof value !== "number" && typeof value !== "string") {
             return null;
@@ -65,6 +164,32 @@
     };
 
     const getPaymentStatus = (booking) => {
+        const hasActualPaymentData =
+            hasActualPaymentAmounts(booking, "deposit") ||
+            hasActualPaymentAmounts(booking, "balance");
+
+        if (hasActualPaymentData) {
+            const totalLkr = getTotalLkr(booking);
+            const depositPaidLkr = getDepositPaidLkr(booking);
+            const balancePaidLkr = getBalancePaidLkr(booking);
+            const outstandingLkr =
+                totalLkr - depositPaidLkr - balancePaidLkr;
+
+            if (
+                booking.balancePaymentStatus === "Balance Due" &&
+                outstandingLkr > 0.01
+            ) {
+                return "Balance Due";
+            }
+
+            return calculateOverallPaymentStatus(
+                totalLkr,
+                depositPaidLkr,
+                balancePaidLkr
+            );
+        }
+
+        // Preserve the established status for legacy records without actual payment amounts.
         const hasBalanceStatus =
             booking.balancePaymentStatus !== undefined &&
             booking.balancePaymentStatus !== null;
@@ -107,6 +232,16 @@
     };
 
     const getDepositPaid = (booking) => {
+        if (hasActualPaymentAmounts(booking, "deposit")) {
+            if (booking.depositPaymentStatus !== "Paid") {
+                return 0;
+            }
+
+            return parseFiniteNonNegativeNumber(
+                booking.depositPaymentAmount
+            ) || 0;
+        }
+
         if (
             booking.depositPaymentStatus === "Paid" &&
             number(booking.depositPaymentAmount) > 0
@@ -129,6 +264,16 @@
     };
 
     const getBalancePaid = (booking) => {
+        if (hasActualPaymentAmounts(booking, "balance")) {
+            if (booking.balancePaymentStatus !== "Paid") {
+                return 0;
+            }
+
+            return parseFiniteNonNegativeNumber(
+                booking.balancePaymentAmount
+            ) || 0;
+        }
+
         if (
             booking.balancePaymentStatus === "Paid" &&
             number(booking.balancePaymentAmount) > 0
@@ -136,9 +281,7 @@
             return number(booking.balancePaymentAmount);
         }
 
-        if (
-            booking.balancePaid === true
-        ) {
+        if (booking.balancePaid === true) {
             return number(booking.balanceAmount);
         }
 
@@ -171,13 +314,12 @@
         );
     };
     const getDepositPaidLkr = (booking) => {
-        if (
-            booking.depositPaymentStatus === "Paid" &&
-            parseFiniteNonNegativeNumber(booking.depositPaymentAmountLkr) > 0
-        ) {
-            return parseFiniteNonNegativeNumber(
-                booking.depositPaymentAmountLkr
-            );
+        const actualPayment = getActualPaymentAmountLkr(
+            booking,
+            "deposit"
+        );
+        if (actualPayment !== null) {
+            return actualPayment;
         }
 
         if (
@@ -195,13 +337,12 @@
     };
 
     const getBalancePaidLkr = (booking) => {
-        if (
-            booking.balancePaymentStatus === "Paid" &&
-            parseFiniteNonNegativeNumber(booking.balancePaymentAmountLkr) > 0
-        ) {
-            return parseFiniteNonNegativeNumber(
-                booking.balancePaymentAmountLkr
-            );
+        const actualPayment = getActualPaymentAmountLkr(
+            booking,
+            "balance"
+        );
+        if (actualPayment !== null) {
+            return actualPayment;
         }
 
         if (booking.balancePaid === true) {
@@ -940,14 +1081,11 @@
         const balancePaid =
             balancePaymentStatus === "Paid";
 
-        const paymentStatus =
-            depositPaid && balancePaid
-                ? "Paid"
-                : depositPaid
-                    ? "Deposit Paid"
-                    : balancePaid
-                        ? "Balance Due"
-                        : "Deposit Required";
+        const paymentStatus = calculateOverallPaymentStatus(
+            getTotalLkr(originalBooking),
+            depositPaid ? depositPaymentAmountLkr : 0,
+            balancePaid ? balancePaymentAmountLkr : 0
+        );
 
         const paymentCurrency =
             balancePaid
@@ -1486,23 +1624,31 @@
             return;
         }
 
-        const currency = currencyElement.value || "AUD";
+        const currency = currencyElement.value || "";
         const previousCurrency = currencyElement.dataset.previousCurrency || "";
 
-        if (currency === "LKR") {
-            exchangeRateElement.value = "1";
-            exchangeRateElement.disabled = true;
-            if (exchangeRateLabel) {
-                exchangeRateLabel.textContent = "Exchange Rate (not required for LKR)";
-            }
-        } else {
-            if (previousCurrency && previousCurrency !== currency) {
+        if (!currency) {
+            if (previousCurrency) {
                 exchangeRateElement.value = "";
             }
             exchangeRateElement.disabled = false;
-            if (exchangeRateLabel) {
-                exchangeRateLabel.textContent = `Exchange Rate (1 ${currency} = LKR)`;
+        } else if (currency === "LKR") {
+            exchangeRateElement.value = "1";
+            exchangeRateElement.disabled = true;
+        } else {
+            if (!previousCurrency || previousCurrency !== currency) {
+                const defaultRate = DEFAULT_EXCHANGE_RATES_TO_LKR[currency];
+                exchangeRateElement.value = defaultRate
+                    ? String(defaultRate)
+                    : "";
             }
+            exchangeRateElement.disabled = false;
+        }
+
+        if (exchangeRateLabel) {
+            exchangeRateLabel.textContent = currency === "LKR"
+                ? "Exchange Rate (not required for LKR)"
+                : `Exchange Rate (1 ${currency} = LKR)`;
         }
 
         currencyElement.dataset.previousCurrency = currency;
@@ -1615,6 +1761,41 @@
         );
     }
 
+    function updatePaymentExchangeRateField(
+        currencyElementId,
+        exchangeRateElementId
+    ) {
+        const currencyElement = document.getElementById(currencyElementId);
+        const exchangeRateElement = document.getElementById(exchangeRateElementId);
+
+        if (!currencyElement || !exchangeRateElement) {
+            return;
+        }
+
+        const currency = currencyElement.value || "";
+        const previousCurrency = currencyElement.dataset.previousCurrency || "";
+
+        if (!currency) {
+            if (previousCurrency) {
+                exchangeRateElement.value = "";
+            }
+            exchangeRateElement.disabled = false;
+        } else if (currency === "LKR") {
+            exchangeRateElement.value = "1";
+            exchangeRateElement.disabled = true;
+        } else {
+            if (!previousCurrency || previousCurrency !== currency) {
+                const defaultRate = DEFAULT_EXCHANGE_RATES_TO_LKR[currency];
+                exchangeRateElement.value = defaultRate
+                    ? String(defaultRate)
+                    : "";
+            }
+            exchangeRateElement.disabled = false;
+        }
+
+        currencyElement.dataset.previousCurrency = currency;
+    }
+
     function resetPaymentExchangeRateOnCurrencyChange(
         currencyElementId,
         exchangeRateElementId,
@@ -1622,21 +1803,23 @@
     ) {
         const currencyElement =
             document.getElementById(currencyElementId);
-        const exchangeRateElement =
-            document.getElementById(exchangeRateElementId);
 
-        if (!currencyElement || !exchangeRateElement) {
+        if (!currencyElement) {
             return;
         }
 
-        currencyElement.addEventListener(
-            "change",
-            () => {
-                exchangeRateElement.value =
-                    currencyElement.value === "LKR" ? "1" : "";
+        const handleCurrencyChange = () => {
+            updatePaymentExchangeRateField(
+                currencyElementId,
+                exchangeRateElementId
+            );
+            recalculate();
+        };
 
-                recalculate();
-            }
+        currencyElement.addEventListener("change", handleCurrencyChange);
+        updatePaymentExchangeRateField(
+            currencyElementId,
+            exchangeRateElementId
         );
     }
 
@@ -2451,15 +2634,11 @@ updateAdminTotalGuests();
                 balanceGracePeriodHours:
                     Number(CONFIG.payment.balanceGracePeriodHours) || 48,
 
-                paymentStatus:
-                    depositPaymentStatus === "Paid" &&
-                    balancePaymentStatus === "Paid"
-                        ? "Paid"
-                        : depositPaymentStatus === "Paid"
-                            ? "Deposit Paid"
-                            : balancePaymentStatus === "Paid"
-                                ? "Balance Due"
-                                : "Deposit Required",
+                paymentStatus: calculateOverallPaymentStatus(
+                    totalLkr,
+                    depositPaymentStatus === "Paid" ? depositPaymentAmountLkr : 0,
+                    balancePaymentStatus === "Paid" ? balancePaymentAmountLkr : 0
+                ),
 
                 depositPaid:
                     depositPaymentStatus === "Paid",
