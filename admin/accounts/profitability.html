@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Profitability | Ja-Ela Serenity Villa</title>
+
+    <link
+        rel="stylesheet"
+        href="../../assets/css/style-new.css"
+    >
+
+    <style>
+        .profitability-page {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .profitability-toolbar,
+        .summary-grid,
+        .metric-grid,
+        .breakdown-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .profitability-toolbar {
+            grid-template-columns:
+                repeat(auto-fit, minmax(160px, 1fr));
+            align-items: end;
+            margin-bottom: 24px;
+        }
+
+        .summary-grid {
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+            margin-bottom: 24px;
+        }
+
+        .metric-grid {
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .breakdown-grid {
+            grid-template-columns:
+                repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .profit-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .profit-card h3 {
+            margin-top: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .profit-value {
+            font-size: 26px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .profit-toolbar-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .period-control[hidden] {
+            display: none !important;
+        }
+
+        .profitability-toolbar select,
+        .profitability-toolbar input,
+        .profitability-toolbar button {
+            width: 100%;
+            min-height: 40px;
+            padding: 8px 10px;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            margin: 28px 0 14px;
+        }
+
+        .profitability-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .profitability-table th,
+        .profitability-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .status-message {
+            margin: 12px 0;
+            min-height: 20px;
+        }
+    </style>
+</head>
+
+<body
+    data-admin-login-path="../login.html"
+    style="visibility:hidden;"
+>
+    <div class="profitability-page">
+
+        <h1>Profitability</h1>
+
+        <nav class="accounts-nav">
+            <a href="/admin/index.html">Admin Portal</a>
+            <a href="/admin/accounts/dashboard.html">Dashboard</a>
+            <a href="/admin/accounts/bookings.html">Bookings</a>
+            <a href="/admin/accounts/payments.html">Payments</a>
+            <a href="/admin/accounts/categories.html">Categories</a>
+            <a href="/admin/accounts/expenses/expenses.html">Expenses</a>
+            <a href="/admin/accounts/utilities/utilities.html">Utility Bills</a>
+        </nav>
+
+        <div class="profitability-toolbar">
+
+            <div>
+                <label
+                    class="profit-toolbar-label"
+                    for="periodType"
+                >
+                    Period
+                </label>
+
+                <select id="periodType">
+                    <option value="month">Month</option>
+                    <option value="quarter">Quarter</option>
+                    <option value="year">Year</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+
+            <div id="periodDateContainer" class="period-control">
+                <label
+                    class="profit-toolbar-label"
+                    for="periodDate"
+                >
+                    Period Date
+                </label>
+
+                <input
+                    id="periodDate"
+                    type="date"
+                >
+            </div>
+
+            <div id="customFromContainer" class="period-control" hidden>
+                <label
+                    class="profit-toolbar-label"
+                    for="customFrom"
+                >
+                    From
+                </label>
+
+                <input
+                    id="customFrom"
+                    type="date"
+                >
+            </div>
+
+            <div id="customToContainer" class="period-control" hidden>
+                <label
+                    class="profit-toolbar-label"
+                    for="customTo"
+                >
+                    To
+                </label>
+
+                <input
+                    id="customTo"
+                    type="date"
+                >
+            </div>
+
+            <div>
+                <button id="applyPeriod" type="button">
+                    Apply
+                </button>
+            </div>
+        </div>
+
+        <div
+            id="statusMessage"
+            class="status-message"
+        ></div>
+
+        <div class="summary-grid">
+
+            <div class="profit-card">
+                <h3>Revenue</h3>
+                <div
+                    class="profit-value"
+                    id="revenue"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Expenses</h3>
+                <div
+                    class="profit-value"
+                    id="expenses"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Utilities</h3>
+                <div
+                    class="profit-value"
+                    id="utilities"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Net Profit</h3>
+                <div
+                    class="profit-value"
+                    id="netProfit"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Profit Margin</h3>
+                <div
+                    class="profit-value"
+                    id="profitMargin"
+                >0.00%</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Occupancy</h3>
+                <div
+                    class="profit-value"
+                    id="occupancy"
+                >0.00%</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">
+            Booking Metrics
+        </h2>
+
+        <div class="metric-grid">
+
+            <div class="profit-card">
+                <h3>Confirmed Bookings</h3>
+                <div
+                    class="profit-value"
+                    id="confirmedBookings"
+                >0</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Booked Nights</h3>
+                <div
+                    class="profit-value"
+                    id="bookedNights"
+                >0</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Calendar Nights</h3>
+                <div
+                    class="profit-value"
+                    id="calendarNights"
+                >0</div>
+            </div>
+
+
+            <div class="profit-card">
+                <h3>Profit / Night</h3>
+                <div
+                    class="profit-value"
+                    id="profitPerNight"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Total Guests</h3>
+                <div
+                    class="profit-value"
+                    id="totalGuests"
+                >0</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Guest Nights</h3>
+                <div
+                    class="profit-value"
+                    id="guestNights"
+                >0</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Revenue / Guest</h3>
+                <div
+                    class="profit-value"
+                    id="revenuePerGuest"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Revenue / Guest-Night</h3>
+                <div
+                    class="profit-value"
+                    id="revenuePerGuestNight"
+                >$0.00</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">
+            Revenue Breakdown
+        </h2>
+
+        <div class="breakdown-grid">
+
+            <div class="profit-card">
+                <h3>Accommodation</h3>
+                <div
+                    class="profit-value"
+                    id="accommodationRevenue"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Extra Guest Fees</h3>
+                <div
+                    class="profit-value"
+                    id="extraGuestRevenue"
+                >$0.00</div>
+            </div>
+
+            <div class="profit-card">
+                <h3>Cleaning Fees</h3>
+                <div
+                    class="profit-value"
+                    id="cleaningRevenue"
+                >$0.00</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">
+            Expense Breakdown
+        </h2>
+
+        <div class="profit-card">
+            <table class="profitability-table">
+                <thead>
+                    <tr>
+                        <th>Expense Type</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody id="expenseBreakdownBody">
+                </tbody>
+            </table>
+
+            <div
+                id="expenseEmpty"
+                class="empty-message"
+                style="display:none;"
+            >
+                No expenses found for the selected period.
+            </div>
+        </div>
+
+        <h2 class="section-title">
+            Utility Breakdown
+        </h2>
+
+        <div class="profit-card">
+            <table class="profitability-table">
+                <thead>
+                    <tr>
+                        <th>Allocation Method</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody id="utilityBreakdownBody">
+                </tbody>
+            </table>
+
+            <div
+                id="utilityEmpty"
+                class="empty-message"
+                style="display:none;"
+            >
+                No utility bills found for the selected period.
+            </div>
+        </div>
+
+
+        <h2 class="section-title">
+            Booking Profitability
+        </h2>
+
+        <div class="profit-card">
+            <table class="profitability-table">
+                <thead>
+                    <tr>
+                        <th>Booking</th>
+                        <th>Guest</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Guests</th>
+                        <th>Nights</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bookingProfitabilityBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"
+    ></script>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"
+    ></script>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"
+    ></script>
+
+    <script
+        src="../../firebase/firebase-config.js"
+    ></script>
+
+    <script
+        src="../../assets/js/admin-auth-guard.js"
+    ></script>
+
+    <script
+        src="./accounts-profitability-utils.js"
+    ></script>
+
+    <script
+        src="./accounts-profitability.js"
+    ></script>
+
+</body>
+</html>
