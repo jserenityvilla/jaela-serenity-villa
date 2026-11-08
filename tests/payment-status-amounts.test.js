@@ -62,16 +62,12 @@ const calculateLkrEquivalent = (amount, rate) => {
 };
 
 const bookingHelpers = new Function(
-    "parseFiniteNonNegativeNumber",
-    "calculateLkrEquivalent",
     "number",
-    overallStatusFunction + "\n" +
-        actualPaymentHelpers + "\n" +
-        paymentStatusHelpers + "\n" +
+    overallStatusFunction + "\\n" +
+        actualPaymentHelpers + "\\n" +
+        paymentStatusHelpers + "\\n" +
         "return { calculateOverallPaymentStatus, getPaymentStatus, getDepositPaidLkr, getBalancePaidLkr, getOutstandingLkr, getActualPaymentAmountLkr };"
 )(
-    parseFiniteNonNegativeNumber,
-    calculateLkrEquivalent,
     value => Number(value) || 0
 );
 
