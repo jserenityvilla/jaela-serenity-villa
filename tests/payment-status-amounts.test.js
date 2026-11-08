@@ -19,7 +19,7 @@ function extractBetween(source, startMarker, endMarker) {
 
 function extractFunction(source, name) {
     const match = source.match(
-        new RegExp("function " + name + "\\\\([\\\\s\\\\S]*?\\\\n    }")
+        new RegExp("function " + name + "\\([\\s\\S]*?\\n    }")
     );
     assert.ok(match, "Function " + name + " was not found.");
     return match[0].trim();
